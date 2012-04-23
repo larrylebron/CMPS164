@@ -1,3 +1,5 @@
 
 /keys/privKey.ppk
 /keys/pubKey
+/gameEngine/ipch
+/gameEngine/gameEngine.sdf
