@@ -1,8 +1,10 @@
-#ifndef MMANAGER_H_INCLUDED
-#define MMANAGER_H_INCLUDED
+//From Gamedev Enginuity Articles
+
+#pragma once
 
 #include <iostream>
 #include <list>
+#include <cassert>
 
 
 class IMMObject
@@ -107,4 +109,3 @@ class  CMMDynamicBlob : public IMMObject
 	unsigned long blobsize(){return dataSize;}
 };
 
-#endif

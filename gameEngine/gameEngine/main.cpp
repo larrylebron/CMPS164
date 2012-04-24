@@ -11,9 +11,20 @@
 
 #include "util.h"
 #include "level.h"
+#include "renderManager.h"
+#include "fileReader.h"
 
 int width = 1000;
 int height = 1000;
+
+//The render manager
+renderManager* rM;
+
+//The current level
+CMMPointer<level> currLev;
+
+//the file reader
+fileReader* fR;
 
 //timer
 double currTime; 
@@ -29,10 +40,12 @@ double farPlane = 10000;
 void new_frame() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	rM->drawLevel(currLev);
 	
 	glLoadIdentity();
 	
 	glutSwapBuffers();
+	IMMObject::CollectGarbage();
 }
 
 void cb_idle() {
@@ -68,6 +81,8 @@ void cb_keyboard(unsigned char key, int x, int y) {
 
 	switch(key) {
 		case 'q':
+			delete rM;
+			IMMObject::CollectRemainingObjects();
 			exit(0);
 			break;
 	}
@@ -84,6 +99,23 @@ void cb_reshape(int w, int h) {
 }
 
 int main(int argc, char** argv) {
+	char mG[] = "minigolf"; //test string for first parameter
+	if ( argc != 3 || (strcmp(mG, argv[1]) != 0) ) {
+		std::cerr << "Usage Error: program requires two command line arguments in the form \"minigolf input_filename\"" << endl;
+		return(1);
+	}
+
+	//Initialize level
+	currLev = new level();
+
+	//Initialize fileReader, read in file, quit if reader fails
+	fR = new fileReader();
+	if( !fR->readFile(argv[2], currLev) ) {
+		cerr << "file reader failed";
+		return(1);
+	}
+
+	currLev->printInfo();
 
 	glutInit(&argc, argv);
 	
@@ -114,8 +146,14 @@ int main(int argc, char** argv) {
 	//initialize random number generator and timer
 	srand((unsigned)time(0)); 
 	currTime = clock() / (CLOCKS_PER_SEC / 1000);
-	
+
+	//initialize render Manager
+	rM = new renderManager();
+
 	glutMainLoop();
+
+	delete currLev;
+	delete rM;
 	IMMObject::CollectRemainingObjects(); //not sure if this will kick in after glut quits
 
 	return 0;

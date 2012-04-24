@@ -11,15 +11,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ball.cpp" />
+    <ClCompile Include="cup.cpp" />
     <ClCompile Include="externalLibs\mmanager.cpp" />
     <ClCompile Include="externalLibs\vec3f.cpp" />
+    <ClCompile Include="fileReader.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="renderManager.cpp" />
+    <ClCompile Include="tee.cpp" />
+    <ClCompile Include="tile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ball.h" />
+    <ClInclude Include="cup.h" />
     <ClInclude Include="externalLibs\mmanager.h" />
     <ClInclude Include="externalLibs\vec3f.h" />
+    <ClInclude Include="fileReader.h" />
     <ClInclude Include="level.h" />
+    <ClInclude Include="renderManager.h" />
+    <ClInclude Include="tee.h" />
+    <ClInclude Include="tile.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

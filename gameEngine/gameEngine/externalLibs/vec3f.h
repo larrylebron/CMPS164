@@ -19,11 +19,7 @@
 /* File for "Terrain" lesson of the OpenGL tutorial on
  * www.videotutorialsrock.com
  */
-
-
-
-#ifndef VEC3F_H_INCLUDED
-#define VEC3F_H_INCLUDED
+#pragma once
 
 #include <iostream>
 
@@ -57,14 +53,3 @@ class Vec3f {
 
 Vec3f operator*(float scale, const Vec3f &v);
 std::ostream &operator<<(std::ostream &output, const Vec3f &v);
-
-
-
-
-
-
-
-
-
-
-#endif
