@@ -28,6 +28,27 @@ tile::tile(int pID, int pNumVerts, int pNumEdges, Vec3f* pVertices, int* pNeighb
 	normal  = pNormal;
 }
 
+Vec3f tile::getNormal() 
+{
+	Vec3f nCopy = normal;
+	return nCopy;
+}
+
+Vec3f* tile::getVertices() 
+{
+	Vec3f* vCopy= new Vec3f[numVertices];
+	for (int i = 0; i < numVertices; i++) {
+		vCopy[i] = vertices[i];
+	}
+	return vCopy;
+}
+
+int tile::getNumVertices() 
+{
+	int cNumVerts = numVertices;
+	return cNumVerts;
+}
+
 void tile::printInfo() {
 	cout << "tile id: " << id << endl;
 	cout << "numVerts: " << numVertices << endl;
@@ -38,4 +59,5 @@ void tile::printInfo() {
 	for (int i = 0; i < numEdges; i++) {
 		cout << neighbors[i] << endl;
 	}
+	cout << "Normal: " << normal << endl;
 }

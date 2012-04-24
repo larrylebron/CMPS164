@@ -53,6 +53,26 @@ void level::addCup(int pId, CMMPointer<cup>* pCup) {
 	cups[pId] = *pCup;
 }
 
+std::map<int, CMMPointer<tile>> level::getTiles() {
+	std::map<int, CMMPointer<tile>>tilesCopy = tiles;
+	return tilesCopy;
+}
+
+std::map<int, CMMPointer<tee>> level::getTees() {
+	std::map<int, CMMPointer<tee>>teesCopy = tees;
+	return teesCopy;
+}
+
+std::map<int, CMMPointer<ball>> level::getBalls() {
+	std::map<int, CMMPointer<ball>>ballsCopy = balls;
+	return ballsCopy;
+}
+
+std::map<int, CMMPointer<cup>> level::getCups() {
+	std::map<int, CMMPointer<cup>>cupsCopy = cups;
+	return cupsCopy;
+}
+
 void level::printInfo() {
 	cout << "Level Info: \n";
 	cout << "Number of tiles: " << numTiles << endl;

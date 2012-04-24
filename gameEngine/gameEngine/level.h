@@ -16,6 +16,11 @@ public:
 	void addBall(int pId, CMMPointer<ball>* pBall);
 	void addTee(int pId, CMMPointer<tee>* pTee);
 	void addCup(int pId, CMMPointer<cup>* pCup);
+	std::map<int, CMMPointer<tile>> getTiles();
+	std::map<int, CMMPointer<ball>> getBalls();
+	std::map<int, CMMPointer<tee>> getTees();
+	std::map<int, CMMPointer<cup>> getCups();
+
 	void printInfo(); //print info about the tiles in the level
 	AUTO_SIZE;
 private:

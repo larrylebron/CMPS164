@@ -20,7 +20,9 @@ public:
 		pNormal: the face normal of the tile
 	*/
 	tile(int pID, int pNumVerts, int pNumEdges, Vec3f* pVertices, int* pNeighbors, Vec3f pNormal);
-
+	Vec3f getNormal();//return a copy of the normal vector
+	Vec3f* getVertices();//return a copy of the array of vertices
+	int getNumVertices(); //return a copy of numVertices
 	~tile();
 
 	//print info about this tile
