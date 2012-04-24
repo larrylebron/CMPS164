@@ -1,4 +1,6 @@
 CMPS 164 Game Engines -- Lab 1 -- Minigolf level rendering
+Larry LeBron -- llebron@soe.ucsc.edu
+Kwong Fai Jonathan Lew -- klew3@ucsc.edu
 
 External Libraries Used:
 

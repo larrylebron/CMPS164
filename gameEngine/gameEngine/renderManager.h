@@ -19,6 +19,8 @@ public:
 	void drawBall(CMMPointer<ball> b);
 	//draw a cup
 	void drawCup(CMMPointer<cup> c);
+	//draw a wall
+	void drawWall(Vec3f start, Vec3f end);
 	AUTO_SIZE;
 };
 

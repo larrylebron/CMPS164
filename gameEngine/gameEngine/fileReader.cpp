@@ -86,7 +86,7 @@ ifstream mapInput(filename);
 			Vec3f c = verticesTemp[2];
 			Vec3f ba = a - b;
 			Vec3f bc = c - a;
-			Vec3f normal = ba.cross(bc).normalize();  // by right hand rule
+			Vec3f normal = bc.cross(ba).normalize();  // by right hand rule
 
 			CMMPointer<tile>* tempTile = 
 				new CMMPointer<tile>(new tile(id, numVertices, numVertices, verticesTemp, neighborsTemp, normal));

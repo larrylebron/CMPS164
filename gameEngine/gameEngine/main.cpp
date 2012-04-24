@@ -29,6 +29,9 @@ double currTime;
 
 //camera modes
 typedef enum {
+	TRANSLATE,
+	ROTATE,
+	ZOOM,
 	CAMERA_PAN,
 	CAMERA_ZOOM,
 	CAMERA_ROTATE,
@@ -74,6 +77,10 @@ string	instructions[NUM_MODES] =
 "CAMERA ROTATE X MODE: Hold down left mouse button and drag up and down to rotate camera along X and Y Axes. Press \"W\" and \"S\" to rotate camera along Z Axis."};
 bool	useKeypressForRotate = !false;
 bool	inverseAxis = !false;
+
+// Model Transformation Variables
+float	translate[3], rotateM[3];			// Current rotation values
+float zoom = 1.0f;
 
 float	cameraZoom, cameraInitialZ;
 Vec3f cameraPan, cameraDirection, rotatedCameraDirection, cameraUp, rotatedCameraUp;
@@ -154,8 +161,8 @@ void updateCamera(int w = viewportWidth, int h = viewportHeight) {
 	std::map<int, CMMPointer<ball>> ballMap = currLev->getBalls();
 	Vec3f ballPos = ballMap.begin()->second->getPosition();
 	Vec3f destination = cameraPan + rotatedCameraDirection;
-	//gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], destination[0], destination[1], destination[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
-	gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], ballPos[0], ballPos[1], ballPos[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
+	gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], destination[0], destination[1], destination[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
+	//gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], ballPos[0], ballPos[1], ballPos[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
 	
 	glutPostRedisplay();
 }
@@ -167,13 +174,20 @@ void new_frame() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+
 	
 	glPushMatrix();
+	glTranslatef(translate[0], translate[1], translate[2]);
+	glRotatef(rotateM[0], 1, 0, 0);
+	glRotatef(rotateM[1], 0, 1, 0);
+	glRotatef(rotateM[2], 0, 0, 1);
+	glScalef(zoom, zoom, zoom);
+
 	rM->drawLevel(currLev);
 	glPopMatrix();
 	
-	//glLoadIdentity(); //do I need this?
-
+	
 	glFlush();
 	glutSwapBuffers();
 	IMMObject::CollectGarbage();
@@ -212,8 +226,7 @@ void cb_mouse( int button, int state, int x, int y )
 
 void cb_motion( int x, int y )
 {
-
-  	float	 x_ratchet;			// X ratchet value
+	float	 x_ratchet;			// X ratchet value
 	float	 y_ratchet;			// Y ratchet value
 
 
@@ -230,6 +243,18 @@ void cb_motion( int x, int y )
 	int axisDirection;
 
 	switch( currentMode ) {
+	case TRANSLATE:	// translation
+		translate[0] += (float) ( x - mouse_x ) / x_ratchet;
+		translate[1] += (float) ( y - mouse_y ) / y_ratchet;
+		break;
+	case ROTATE: // rotation
+		// reverse the axis because its more intuitive
+		rotateM [1] += (float) ( x - mouse_x ) / x_ratchet * rotationDullFactor;
+		rotateM [0] -= (float) ( y - mouse_y ) / y_ratchet * rotationDullFactor;
+		break;
+	case ZOOM:
+		// does nothing, keyboard only
+		break;
 	case CAMERA_PAN:
 		axisDirection = (inverseAxis) ? -1 : 1;
 		cameraPan = cameraPan + (Vec3f((float) ( x - mouse_x ) / x_ratchet, (float) ( y - mouse_y ) / y_ratchet, 0.0f) * axisDirection);
@@ -253,11 +278,24 @@ void cb_motion( int x, int y )
 void handleUpDown(int direction)
 {
 	switch( currentMode ) {
+	case TRANSLATE: // handles Z translation
+		translate[2] += 0.1f * direction * cameraPan[2];
+		break;
+	case ZOOM: // handles zooming
+		zoom += 0.05f * direction;
+		break;
 	case CAMERA_PAN: // handles z panning
 		cameraPan = cameraPan + Vec3f(0.0f, 0.0f, 0.5f * direction);
 		break;
 	case CAMERA_ZOOM: // handles camera zooming
 		cameraZoom += 0.05f * direction;
+		break;
+
+	case ROTATE:
+		if (useKeypressForRotate)
+		{
+			rotateM [2] += 2.0f * direction;
+		}
 		break;
 	case CAMERA_ROTATE:
 		cameraRotate[2] += direction * cameraRotationDullFactor;
@@ -269,16 +307,25 @@ void handle_menu( int ID ) {
 
 	cout << endl << instructions[ID];
 	switch( ID ) {
-	case 0: // camera panning
+	case 0:	// translation
+		currentMode = TRANSLATE;
+		break;
+	case 1:	// rotation
+		currentMode = ROTATE;
+		break;
+	case 2:	// zooming
+		currentMode = ZOOM;
+		break;
+	case 3: // camera panning
 		currentMode = CAMERA_PAN;
 		break;
-	case 1: // cammera zooming
+	case 4: // cammera zooming
 		currentMode = CAMERA_ZOOM;
 		break;
-	case 2: // cammera rotate X
+	case 5: // cammera rotate X
 		currentMode = CAMERA_ROTATE;
 		break;
-	case 3: // Quit
+	case 6: // Quit
 		exit(0);
 		break;
 	}
@@ -344,10 +391,13 @@ int main(int argc, char** argv) {
 
 	// Right Click Menu
 	glutCreateMenu( handle_menu );	// Setup GLUT popup menu
-	glutAddMenuEntry( "Camera Pan", 0);
-	glutAddMenuEntry( "Camera Zoom", 1);
-	glutAddMenuEntry( "Camera Rotate", 2);
-	glutAddMenuEntry( "Quit", 3);
+	glutAddMenuEntry( "Translate", 0);
+	glutAddMenuEntry( "Rotate", 1);
+	glutAddMenuEntry( "Zoom", 2);
+	glutAddMenuEntry( "Camera Pan", 3);
+	glutAddMenuEntry( "Camera Zoom", 4);
+	glutAddMenuEntry( "Camera Rotate", 5);
+	glutAddMenuEntry( "Quit", 6);
 	glutAttachMenu( GLUT_RIGHT_BUTTON );
 	cout << instructions[currentMode] << endl;
 
