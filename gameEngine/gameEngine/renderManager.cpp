@@ -39,7 +39,8 @@ void renderManager::drawLevel(CMMPointer<level> lev) {
 
 void renderManager::drawTile(CMMPointer<tile> t) 
 {
-
+	GLfloat tileColor[3] = { 0.0f, 0.9f, 0.0f };
+	glColor3fv(tileColor);
 	Vec3f normal = t->getNormal();
 	Vec3f* vertices = t->getVertices();
 	int numVerts = t->getNumVertices();
@@ -55,10 +56,26 @@ void renderManager::drawTile(CMMPointer<tile> t)
 
 void renderManager::drawBall(CMMPointer<ball> b) 
 {
+	Vec3f position = b->getPosition();
+	GLfloat ballColor[3] = { 1.0f, 0.0f, 0.0f };
+	glColor3fv(ballColor);
+	glLoadIdentity();
+	glPushMatrix();
+	glTranslatef(position[0], position[1], position[2]);
+	glutSolidSphere(.05, 10, 10);
+	glPopMatrix();
 }
 
 
 void renderManager::drawCup(CMMPointer<cup> c) 
 {
+	Vec3f position = c->getPosition();
+	GLfloat ballColor[3] = { 0.0f, 0.0f, 0.0f };
+	glColor3fv(ballColor);
+	glLoadIdentity();
+	glPushMatrix();
+	glTranslatef(position[0], position[1], position[2]);
+	glutSolidSphere(.07, 10, 10);
+	glPopMatrix();
 }
 

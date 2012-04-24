@@ -49,6 +49,25 @@ int tile::getNumVertices()
 	return cNumVerts;
 }
 
+int tile::getNumEdges() 
+{
+	int cNumEdges = numEdges;
+	return cNumEdges;
+}
+
+int* tile::getNeighbors(){
+	int* nCopy= new int[numEdges];
+	for (int i = 0; i < numEdges; i++) {
+		nCopy[i] = neighbors[i];
+	}
+	return nCopy;
+}
+
+int tile::getId() {
+	int cId = id;
+	return cId;
+}
+
 void tile::printInfo() {
 	cout << "tile id: " << id << endl;
 	cout << "numVerts: " << numVertices << endl;

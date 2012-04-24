@@ -13,8 +13,7 @@ fileReader::~fileReader()
 
 bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 	// read files into streams
-
-	ifstream mapInput(filename);
+ifstream mapInput(filename);
 
 	if (mapInput.fail()){
 		cerr << "failed to open " << filename << " attempting to add .db extension\n";
@@ -136,9 +135,13 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 	}
 
 	mapInput.close();
+
+	if (!map->checkLevel()) {
+		return false;
+	}
+
 	return true;
 }
-
 vector<string> fileReader::strSplit(string data, string delims) {
        // loops through character by character and delimits when the delimiter is found
        vector<string> toks;

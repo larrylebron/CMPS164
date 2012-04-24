@@ -23,6 +23,9 @@ public:
 	Vec3f getNormal();//return a copy of the normal vector
 	Vec3f* getVertices();//return a copy of the array of vertices
 	int getNumVertices(); //return a copy of numVertices
+	int getNumEdges();
+	int* getNeighbors(); //return a copy of the array of neighbors
+	int getId();
 	~tile();
 
 	//print info about this tile

@@ -1,4 +1,5 @@
-//From Gamedev Enginuity Articles
+//From http://www.gamedev.net/page/resources/_/technical/game-programming/enginuity-part-ii-r1954
+//by Richard Fine
 
 #pragma once
 

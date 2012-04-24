@@ -73,6 +73,36 @@ std::map<int, CMMPointer<cup>> level::getCups() {
 	return cupsCopy;
 }
 
+bool level::checkLevel() {
+	//check the tiles to ensure all neighbors exist
+	std::map<int, CMMPointer<tile>>::iterator it;
+	CMMPointer<tile> t;
+	for ( it=tiles.begin(); it != tiles.end(); it++ ) {
+		
+		t = it->second;
+		int n = t->getNumEdges();
+		int* neighbors = t->getNeighbors();
+		
+		for(int i = 0; i < n; i++) {
+			if (neighbors[i] != 0 && tiles.find(neighbors[i]) == tiles.end() ) {
+				std::cerr << "Neighbor " << i << " in tile id" << t->getId() << " is invalid";
+				return false;
+			}
+		}//end neighbor search
+	} //end all tile search
+
+	if (numBalls < 1) {
+		std::cerr << "No balls in the level";
+		return false;
+	} else if (numCups < 1) {
+		std::cerr << "No cups in the level";
+		return false;
+	} else if (numTees < 1) {
+		std::cerr << "No tees in the level";
+		return false;
+	}
+	return true;
+}
 void level::printInfo() {
 	cout << "Level Info: \n";
 	cout << "Number of tiles: " << numTiles << endl;

@@ -29,9 +29,6 @@ double currTime;
 
 //camera modes
 typedef enum {
-	TRANSLATE,
-	ROTATE,
-	ZOOM,
 	CAMERA_PAN,
 	CAMERA_ZOOM,
 	CAMERA_ROTATE,
@@ -70,22 +67,13 @@ int		btn[2] = {0};			// Current button state
 int		mouse_x, mouse_y;			// Current mouse position
 
 // Transformation and Shading Mode Variables
-mode	currentMode = TRANSLATE;	// Current transformation mode
+mode	currentMode = CAMERA_PAN;	// Current transformation mode
 string	instructions[NUM_MODES] =
-{"MODEL TRANSLATE MODE: Hold down left mouse button and drag to translate model along X and Y Axis. Press \"W\" and \"S\" to translate model along Z Axis.",
-"MODEL ZOOM MODE: Press \"W\" and \"S\" to zoom model in and out - model zooms equally along all axes.",
-"MODEL ROTATE MODE: Hold down left mouse button and drag to rotate model around X or Y Axis.",
-"CAMERA PAN MODE: Hold down left mouse button and drag to pan camera along X and Y Axis. Press \"W\" and \"S\" to pan camera along Z Axis.",
+{"CAMERA PAN MODE: Hold down left mouse button and drag to pan camera along X and Y Axis. Press \"W\" and \"S\" to pan camera along Z Axis.",
 "CAMERA ZOOM MODE: Press \"W\" and \"S\" to zoom camera in and out. ",
 "CAMERA ROTATE X MODE: Hold down left mouse button and drag up and down to rotate camera along X and Y Axes. Press \"W\" and \"S\" to rotate camera along Z Axis."};
-bool	isSmoothShading = false;
 bool	useKeypressForRotate = !false;
 bool	inverseAxis = !false;
-string modelRotateInstructions = "Press \"W\" and \"S\" to rotate model around Z Axis.";
-
-// Model Transformation Variables
-float	translate[3], rotateM[3];			// Current rotation values
-float zoom;
 
 float	cameraZoom, cameraInitialZ;
 Vec3f cameraPan, cameraDirection, rotatedCameraDirection, cameraUp, rotatedCameraUp;
@@ -101,7 +89,6 @@ float cameraRotationDullFactor = 2.0f;
 // Camera and Light Variables
 GLfloat lightColor[]	= {1.0f, 1.0f, 1.0f, 1.0f};
 GLfloat lightPos[]		= {1.0f, 1.0f, 1.0f, 1.0f}; 
-std::map<string, Color> colors;
 
 // Viewport Variables
 int viewportX = 0, viewportY = 0, viewportWidth = 1024, viewportHeight = 768;
@@ -130,14 +117,9 @@ float bringWithinRange (float f, float range = 360.0f)
 //////////////////////////////
 
 void resetTransformations() {
-	translate[0] = translate[2] = 0.0f;		// Current translation values
-	translate[1] = 3.0f;
-	rotateM[0] = rotateM[0] = rotateM[0] = 0.0f;			// Current rotation values
-	zoom = 1.0f;
-
 	cameraZoom = 1.0f;
-	cameraInitialZ = 40.f;
-	cameraPan = Vec3f(0.0f, 0.0f, cameraInitialZ);
+	cameraInitialZ = 10.f;
+	cameraPan = Vec3f(0.0f, 1.0f, cameraInitialZ);
 	rotatedCameraDirection = cameraDirection = Vec3f(0.0f, 0.0f, -cameraInitialZ);
 	rotatedCameraUp = cameraUp = Vec3f(0.0f, 1.0f, 0.0f);
 
@@ -169,8 +151,12 @@ void updateCamera(int w = viewportWidth, int h = viewportHeight) {
 		updateCameraDirection();
 	}
 
+	std::map<int, CMMPointer<ball>> ballMap = currLev->getBalls();
+	Vec3f ballPos = ballMap.begin()->second->getPosition();
 	Vec3f destination = cameraPan + rotatedCameraDirection;
-	gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], destination[0], destination[1], destination[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
+	//gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], destination[0], destination[1], destination[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
+	gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], ballPos[0], ballPos[1], ballPos[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
+	
 	glutPostRedisplay();
 }
 
@@ -244,18 +230,6 @@ void cb_motion( int x, int y )
 	int axisDirection;
 
 	switch( currentMode ) {
-	case TRANSLATE:	// translation
-		translate[0] += (float) ( x - mouse_x ) / x_ratchet;
-		translate[1] += (float) ( y - mouse_y ) / y_ratchet;
-		break;
-	case ROTATE: // rotation
-		// reverse the axis because its more intuitive
-		rotateM [1] += (float) ( x - mouse_x ) / x_ratchet * rotationDullFactor;
-		rotateM [0] -= (float) ( y - mouse_y ) / y_ratchet * rotationDullFactor;
-		break;
-	case ZOOM:
-		// does nothing, keyboard only
-		break;
 	case CAMERA_PAN:
 		axisDirection = (inverseAxis) ? -1 : 1;
 		cameraPan = cameraPan + (Vec3f((float) ( x - mouse_x ) / x_ratchet, (float) ( y - mouse_y ) / y_ratchet, 0.0f) * axisDirection);
@@ -279,24 +253,11 @@ void cb_motion( int x, int y )
 void handleUpDown(int direction)
 {
 	switch( currentMode ) {
-	case TRANSLATE: // handles Z translation
-		translate[2] += 0.1f * direction * cameraPan[2];
-		break;
-	case ZOOM: // handles zooming
-		zoom += 0.05f * direction;
-		break;
 	case CAMERA_PAN: // handles z panning
 		cameraPan = cameraPan + Vec3f(0.0f, 0.0f, 0.5f * direction);
 		break;
 	case CAMERA_ZOOM: // handles camera zooming
 		cameraZoom += 0.05f * direction;
-		break;
-
-	case ROTATE:
-		if (useKeypressForRotate)
-		{
-			rotateM [2] += 2.0f * direction;
-		}
 		break;
 	case CAMERA_ROTATE:
 		cameraRotate[2] += direction * cameraRotationDullFactor;
@@ -308,28 +269,16 @@ void handle_menu( int ID ) {
 
 	cout << endl << instructions[ID];
 	switch( ID ) {
-	case 0:	// translation
-		currentMode = TRANSLATE;
-		break;
-	case 1:	// rotation
-		currentMode = ROTATE;
-		if (useKeypressForRotate){
-			cout << modelRotateInstructions;
-		}
-		break;
-	case 2:	// zooming
-		currentMode = ZOOM;
-		break;
-	case 3: // camera panning
+	case 0: // camera panning
 		currentMode = CAMERA_PAN;
 		break;
-	case 4: // cammera zooming
+	case 1: // cammera zooming
 		currentMode = CAMERA_ZOOM;
 		break;
-	case 5: // cammera rotate X
+	case 2: // cammera rotate X
 		currentMode = CAMERA_ROTATE;
 		break;
-	case 6: // Quit
+	case 3: // Quit
 		exit(0);
 		break;
 	}
@@ -341,9 +290,6 @@ void cb_keyboard(unsigned char key, int x, int y) {
 	case 27: //Escape key
 		exit(0);
 		IMMObject::CollectRemainingObjects(); //Memory cleanup
-		break;
-	case 'q':
-		isSmoothShading = !isSmoothShading;
 		break;
 	case 'w':
 		handleUpDown(DECREASE);
@@ -381,8 +327,6 @@ int main(int argc, char** argv) {
 		return(1);
 	}
 
-	currLev->printInfo();
-
 	glutInit(&argc, argv);
 	
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
@@ -392,23 +336,18 @@ int main(int argc, char** argv) {
 	resetTransformations();
 
 	// Instructions
-	cout << "====================" << endl;
-	cout << "CMPS 162 - Program 0" << endl;
-	cout << "====================" << endl << endl;
+	cout << "==========================================" << endl;
+	cout << "CMPS 164 - Lab 1: Minigolf Level Rendering" << endl;
+	cout << "==========================================" << endl << endl;
 	cout << "Instructions: " << endl;
-	cout << "Use Right Click to Select Modes. Starting Mode: MODEL TRANSLATE MODE." << endl;
-	cout << "Press \"R\" to reset model to initial position." << endl;
-	cout << "Press \"Q\" to switch between smooth shading and flat shading." << endl << endl;
+	cout << "Use Right Click to Select Modes. Starting Mode: CAMERA PAN." << endl;
 
 	// Right Click Menu
 	glutCreateMenu( handle_menu );	// Setup GLUT popup menu
-	glutAddMenuEntry( "Translate", 0);
-	glutAddMenuEntry( "Rotate", 1);
-	glutAddMenuEntry( "Zoom", 2);
-	glutAddMenuEntry( "Camera Pan", 3);
-	glutAddMenuEntry( "Camera Zoom", 4);
-	glutAddMenuEntry( "Camera Rotate", 5);
-	glutAddMenuEntry( "Quit", 6);
+	glutAddMenuEntry( "Camera Pan", 0);
+	glutAddMenuEntry( "Camera Zoom", 1);
+	glutAddMenuEntry( "Camera Rotate", 2);
+	glutAddMenuEntry( "Quit", 3);
 	glutAttachMenu( GLUT_RIGHT_BUTTON );
 	cout << instructions[currentMode] << endl;
 
@@ -418,7 +357,8 @@ int main(int argc, char** argv) {
 	glutMotionFunc(cb_motion);
 	glutReshapeFunc(cb_reshape);
 	glutIdleFunc(cb_idle);
-	glutKeyboardFunc(cb_keyboard);
+	glutKeyboardFunc(cb_keyboard);	
+
 	//glutSpecialFunc(specialKeyboard);  
 	
 	glClearDepth(1.0);
@@ -427,9 +367,7 @@ int main(int argc, char** argv) {
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_NORMALIZE);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	if (isSmoothShading) {
-		glShadeModel(GL_SMOOTH); //Enable smooth shading
-	}
+	glShadeModel(GL_SMOOTH);
 	
 	//Add positioned light
 	glEnable(GL_LIGHTING);

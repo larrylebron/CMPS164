@@ -8,6 +8,7 @@ public:
 	tee();
 	tee(int pID, Vec3f pPosition);
 	~tee();
+	Vec3f getPosition();
 	void printInfo();
 	AUTO_SIZE;
 private:

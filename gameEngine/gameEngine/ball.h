@@ -8,6 +8,7 @@ public:
 	ball();
 	ball::ball(int pID, Vec3f pPosition);
 	~ball();
+	Vec3f getPosition();
 	void printInfo();
 	AUTO_SIZE;
 private:

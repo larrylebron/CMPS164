@@ -7,6 +7,7 @@ public:
 	cup();
 	cup(int pID, Vec3f pPosition);
 	~cup();
+	Vec3f getPosition();
 	void printInfo();
 	AUTO_SIZE;
 private:
