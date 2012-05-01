@@ -1,10 +1,27 @@
-﻿Build started 4/24/2012 3:31:23 PM.
+﻿Build started 5/1/2012 2:25:34 PM.
      1>Project "C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\game engines\gameEngine\gameEngine\gameEngine.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\gameEngine.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt renderManager.cpp
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt fileReader.cpp main.cpp renderManager.cpp
          renderManager.cpp
+         Generating Code...
+         Compiling...
+         fileReader.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(23): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(110) : see declaration of 'strcat'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(73): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(73): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(73): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(106): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(106): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(106): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(116): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(116): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\game engines\gameengine\gameengine\filereader.cpp(116): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+         Generating Code...
+         Skipping... (no relevant changes detected)
+         main.cpp
        ManifestResourceCompile:
          All outputs are up-to-date.
        Link:
@@ -32,4 +49,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.78
+Time Elapsed 00:00:04.94
