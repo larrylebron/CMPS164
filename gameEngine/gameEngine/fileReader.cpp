@@ -13,7 +13,7 @@ fileReader::~fileReader()
 
 bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 	// read files into streams
-ifstream mapInput(filename);
+	ifstream mapInput(filename);
 
 	if (mapInput.fail()){
 		cerr << "failed to open " << filename << " attempting to add .db extension\n";

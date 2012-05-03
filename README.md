@@ -9,3 +9,6 @@ http://www.gamedev.net/page/resources/_/technical/game-programming/enginuity-par
 
 Vec3f Library from:
 www.videotutorialsrock.com
+
+Timer class from:
+http://www.songho.ca/misc/timer/timer.html

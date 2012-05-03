@@ -13,6 +13,7 @@
 #include "level.h"
 #include "renderManager.h"
 #include "fileReader.h"
+#include "externalLibs\Timer.h"
 
 
 //The render manager
@@ -431,6 +432,10 @@ int main(int argc, char** argv) {
 
 	//initialize render Manager
 	rM = new renderManager();
+
+	//for debugging
+	Logger* log = Logger::Instance();
+	
 
 	glutMainLoop();
 

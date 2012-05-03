@@ -11,9 +11,12 @@
 #include <string>
 
 #include "externalLibs/mmanager.h"
+#include "Logger.h"
 
 const double PI = 3.1415926538;
 
+
 using std::string;
 using std::cout;
+using std::cerr;
 using std::endl;
