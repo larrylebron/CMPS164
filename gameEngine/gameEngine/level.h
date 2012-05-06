@@ -7,6 +7,7 @@
 #include "tee.h"
 #include "ball.h"
 #include "cup.h"
+#include "Logger.h"
 
 class level : public IMMObject
 {
@@ -27,7 +28,7 @@ public:
 	//Check the level to confirm it's valid
 	bool checkLevel();
 
-	void printInfo(); //print info about the tiles in the level
+	string toString(); //print info about the tiles in the level
 	AUTO_SIZE;
 private:
 	//The tiles comprising the level, indexed by their ids

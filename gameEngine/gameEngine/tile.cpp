@@ -68,7 +68,9 @@ int tile::getId() {
 	return cId;
 }
 
-void tile::printInfo() {
+string tile::toString() {
+	return "tile info";
+	/*
 	cout << "tile id: " << id << endl;
 	cout << "numVerts: " << numVertices << endl;
 	for (int i = 0; i < numVertices; i++) {
@@ -79,4 +81,5 @@ void tile::printInfo() {
 		cout << neighbors[i] << endl;
 	}
 	cout << "Normal: " << normal << endl;
+	*/
 }

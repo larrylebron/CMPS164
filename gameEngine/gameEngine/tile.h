@@ -29,7 +29,7 @@ public:
 	~tile();
 
 	//print info about this tile
-	void printInfo();
+	string toString();
 	AUTO_SIZE;
 private:
 	Vec3f* vertices;

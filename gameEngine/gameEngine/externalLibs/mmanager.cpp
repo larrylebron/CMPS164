@@ -17,6 +17,7 @@ IMMObject::~IMMObject()
 
 void IMMObject::CollectGarbage()
 {
+
 	for(std::list<IMMObject*>::iterator it=deadObjects.begin();it!=deadObjects.end();)
 	{
 		IMMObject *o=(*it);
@@ -28,12 +29,11 @@ void IMMObject::CollectGarbage()
 
 void IMMObject::AddRef()
 {
-	refCount++;
-}
+	refCount++;}
 
 void IMMObject::Release()
 {
-	refCount--; 
+refCount--; 
 	if(refCount<=0)
 	{
 		//remove self from live list
@@ -51,16 +51,14 @@ void IMMObject::CollectRemainingObjects(bool bEmitWarnings)
 		IMMObject *o=(*it);
 		if(bEmitWarnings)
 		{
-			//copy the object to a temporary buffer so that our '10 bytes' message doesn't
-			//cause an access violation
-			/*
-			char szBuf[11]; ZeroMemory(szBuf,11);
-			memcpy(szBuf,o,min(o->size(),10));
-			CLog::Get().Write(LOG_APP,IDS_UNRELEASED_OBJECT,o,o->size(),szBuf);
-			*/
 			Logger::Instance()->err("Object wasn't properly deleted in CollectGarbage");
 		}
 		delete o;
 	}
 	liveObjects.clear();
+}
+
+string IMMObject::toString() {
+	string info = "IMMobject";
+	return info;
 }

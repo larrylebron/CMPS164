@@ -11,7 +11,6 @@
 #include <string>
 
 #include "externalLibs/mmanager.h"
-#include "Logger.h"
 
 const double PI = 3.1415926538;
 

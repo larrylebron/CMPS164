@@ -4,10 +4,11 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include <list>
 #include <cassert>
 
-#include "../Logger.h"
+#include "..\Logger.h"
 
 
 class IMMObject
@@ -25,7 +26,10 @@ class IMMObject
 		static void CollectGarbage();
 		static void CollectRemainingObjects(bool bEmitWarnings=false);
 		virtual unsigned long size()=0;
+		virtual string toString(); // return an info string about the object
 };
+
+
 
 #define AUTO_SIZE unsigned long size(){return sizeof(*this);}
 

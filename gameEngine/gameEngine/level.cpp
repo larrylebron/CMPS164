@@ -105,7 +105,9 @@ bool level::checkLevel() {
 	}
 	return true;
 }
-void level::printInfo() {
+string level::toString() {
+	return "level info";
+	/*
 	cout << "Level Info: \n";
 	cout << "Number of tiles: " << numTiles << endl;
 	std::map<int, CMMPointer<tile>>::iterator it;
@@ -131,4 +133,5 @@ void level::printInfo() {
 	for ( itC=cups.begin(); itC != cups.end(); itC++ ) {
 		(*itC).second->printInfo();
 	}
+	*/
 }

@@ -21,7 +21,8 @@ Vec3f cup::getPosition() {
 	return posCopy;
 }
 
-void cup::printInfo() {
-	cout << "cup id: " << id << endl;
-	cout << "position: " << position << endl;
+string cup::toString() {
+	std::stringstream ss;
+	ss << "cup id: " << id << endl << "position: " << position << endl;
+	return ss.str();
 }

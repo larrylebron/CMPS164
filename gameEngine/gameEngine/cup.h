@@ -8,7 +8,7 @@ public:
 	cup(int pID, Vec3f pPosition);
 	~cup();
 	Vec3f getPosition();
-	void printInfo();
+	string toString();
 	AUTO_SIZE;
 private:
 	int id;

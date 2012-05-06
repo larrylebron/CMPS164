@@ -21,7 +21,8 @@ Vec3f ball::getPosition() {
 	return posCopy;
 }
 
-void ball::printInfo() {
-	cout << "ball id: " << id << endl;
-	cout << "position: " << position << endl;
+string ball::toString() {
+	std::stringstream ss;
+	ss << "ball id: " << id << endl << "position: " << position << endl;
+	return ss.str();
 }

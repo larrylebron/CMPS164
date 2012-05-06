@@ -14,6 +14,7 @@
 #include "renderManager.h"
 #include "fileReader.h"
 #include "externalLibs\Timer.h"
+#include "Logger.h"
 
 
 //The render manager

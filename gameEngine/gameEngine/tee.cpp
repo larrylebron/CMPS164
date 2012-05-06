@@ -21,7 +21,8 @@ Vec3f tee::getPosition() {
 	return posCopy;
 }
 
-void tee::printInfo() {
-	cout << "tee id: " << id << endl;
-	cout << "position: " << position << endl;
+string tee::toString() {
+	std::stringstream ss;
+	ss << "tee id: " << id << endl << "position: " << position << endl;
+	return ss.str();
 }

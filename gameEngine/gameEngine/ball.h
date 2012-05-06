@@ -9,7 +9,7 @@ public:
 	ball::ball(int pID, Vec3f pPosition);
 	~ball();
 	Vec3f getPosition();
-	void printInfo();
+	string toString();
 	AUTO_SIZE;
 private:
 	int id;

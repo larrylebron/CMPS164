@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include "util.h"
+#include "Logger.h"
 #include "level.h"
 
 using std::ifstream;
