@@ -85,20 +85,22 @@ bool level::checkLevel() {
 		
 		for(int i = 0; i < n; i++) {
 			if (neighbors[i] != 0 && tiles.find(neighbors[i]) == tiles.end() ) {
-				std::cerr << "Neighbor " << i << " in tile id" << t->getId() << " is invalid";
+				std::stringstream msg;
+				msg << "Neighbor " << i << " in tile id" << t->getId() << " is invalid";
+				Logger::Instance()->err(msg.str());
 				return false;
 			}
 		}//end neighbor search
 	} //end all tile search
 
 	if (numBalls < 1) {
-		std::cerr << "No balls in the level";
+		Logger::Instance()->err("No balls in the level");
 		return false;
 	} else if (numCups < 1) {
-		std::cerr << "No cups in the level";
+		Logger::Instance()->err("No cups in the level");
 		return false;
 	} else if (numTees < 1) {
-		std::cerr << "No tees in the level";
+		Logger::Instance()->err("No tees in the level");
 		return false;
 	}
 	return true;

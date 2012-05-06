@@ -1,6 +1,7 @@
 #pragma once
 
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include "util.h"
 #include "level.h"

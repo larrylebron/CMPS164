@@ -360,8 +360,9 @@ void cb_reshape(int w, int h) {
 
 int main(int argc, char** argv) {
 	char mG[] = "minigolf"; //test string for first parameter
+	
 	if ( argc != 3 || (strcmp(mG, argv[1]) != 0) ) {
-		std::cerr << "Usage Error: program requires two command line arguments in the form \"minigolf input_filename\"" << endl;
+		Logger::Instance()->err("Usage Error: program requires two command line arguments in the form \"minigolf input_filename\"");
 		return(1);
 	}
 
@@ -371,7 +372,7 @@ int main(int argc, char** argv) {
 	//Initialize fileReader, read in file, quit if reader fails
 	fR = new fileReader();
 	if( !fR->readFile(argv[2], currLev) ) {
-		cerr << "file reader failed";
+		Logger::Instance()->err("file reader failed");
 		return(1);
 	}
 
@@ -435,7 +436,6 @@ int main(int argc, char** argv) {
 
 	//for debugging
 	Logger* log = Logger::Instance();
-	
 
 	glutMainLoop();
 

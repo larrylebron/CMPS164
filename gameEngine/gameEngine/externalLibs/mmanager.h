@@ -7,6 +7,8 @@
 #include <list>
 #include <cassert>
 
+#include "../Logger.h"
+
 
 class IMMObject
 {

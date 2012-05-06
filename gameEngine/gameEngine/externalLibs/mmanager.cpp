@@ -58,7 +58,7 @@ void IMMObject::CollectRemainingObjects(bool bEmitWarnings)
 			memcpy(szBuf,o,min(o->size(),10));
 			CLog::Get().Write(LOG_APP,IDS_UNRELEASED_OBJECT,o,o->size(),szBuf);
 			*/
-			std::cerr << "Object wasn't properly deleted in CollectGarbage";
+			Logger::Instance()->err("Object wasn't properly deleted in CollectGarbage");
 		}
 		delete o;
 	}

@@ -16,18 +16,19 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 	ifstream mapInput(filename);
 
 	if (mapInput.fail()){
-		cerr << "failed to open " << filename << " attempting to add .db extension\n";
+		std::string stringFile(filename); //string filename for passing to the logger
+		Logger::Instance()->err("failed to open " + stringFile + " attempting to add .db extension");
 		mapInput.clear();
 
 		char fileExt[] = ".db";
 		strcat(filename, fileExt);
-		cout << "appended name: " << filename << endl;
+		Logger::Instance()->write("Attempting to open level file with appended name: " + stringFile + ".db");
 		mapInput.open(filename, ifstream::in);
 
 		// throws error if reading failed
 		if (mapInput.fail()) 
 		{
-			cerr << "Error: File not Found - " << filename << endl;
+			Logger::Instance()->err("Error: File not Found: " + stringFile);
 			return false;
 		}
 	}
@@ -46,8 +47,12 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 		// first token to the dataType
 		string type = tokens[0];
 
+		//A string stream of the line number for the logger
+		std::stringstream sLineNumber;
+		sLineNumber << lineNumber;
+
 		if (tokens.size() < 5) {
-			cerr << "Error: Invalid data in data file, line " << lineNumber << endl;
+			Logger::Instance()->err("Error: Invalid data in data file, line " + sLineNumber.str() );
 			return false;
 		} else if (tokens[0].compare(DataTypeTile) == 0) {
 
@@ -57,7 +62,7 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 			// if total number of tokens dont add up, throw an error
 			//type, id, numVertices + 3 verts and 1 neighbor per vertex
 			if (tokens.size() != 3 + 4 * numVertices) {
-				cerr << "Error: Invalid tile data in data file, line " << lineNumber << endl;
+				Logger::Instance()->err("Error: Invalid data in data file, line " + sLineNumber.str() );
 				return false;
 			}
 
@@ -126,7 +131,7 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 			delete tempTee;
 			delete tempBall;
 		} else {
-			cerr << "Error: Unknown Type in data file, line " << lineNumber << endl;
+			Logger::Instance()->err("Error: Unknown Type in data file, line " + sLineNumber.str() );
 			return false;
 		}
 		

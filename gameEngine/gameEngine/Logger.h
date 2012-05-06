@@ -1,5 +1,21 @@
 /**
 Core code from http://www.yolinux.com/TUTORIALS/C++Singleton.html
+
+Expanded by Larry LeBron
+
+Logging Class
+
+USAGE:
+==========================================================================================================
+	Logger::Instance()->err("string error message"); //Writes to the error log and cerr
+	Logger::Instance()->write("string message"); //Writes to the general log and cout
+	Logger::Instance()->write("string filename", "string message"); //Writes to the designated file
+		
+	All files will be placed in the /logs directory. If this directory doesn't exist, the logger will fail
+
+	A Logger* can also be used like:
+		Logger* log = Logger::Instancer()
+		log->write("string message");
 */
 
 #pragma once

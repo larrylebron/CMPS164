@@ -2,6 +2,7 @@
 #include "util.h"
 #include <Windows.h>
 #include <map>
+#include <sstream>
 #include "tile.h"
 #include "tee.h"
 #include "ball.h"
