@@ -1,6 +1,7 @@
 //From http://www.gamedev.net/page/resources/_/technical/game-programming/enginuity-part-ii-r1954
 //by Richard Fine
-
+#ifndef MMANAGER_H
+#define MMANAGER_H
 #pragma once
 
 #include <iostream>
@@ -116,3 +117,4 @@ class  CMMDynamicBlob : public IMMObject
 	unsigned long blobsize(){return dataSize;}
 };
 
+#endif

@@ -1,3 +1,6 @@
+#ifndef FILE_READER_H
+#define FILE_READER_H
+
 #pragma once
 
 #include <fstream>
@@ -26,3 +29,4 @@ public:
 	vector<string> strSplit(string data, string delims = " ");
 };
 
+#endif

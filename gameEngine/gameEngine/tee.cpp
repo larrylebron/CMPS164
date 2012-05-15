@@ -1,10 +1,5 @@
 #include "tee.h"
 
-
-tee::tee()
-{
-}
-
 tee::tee(int pID, Vec3f pPosition)
 {
 	id = pID;

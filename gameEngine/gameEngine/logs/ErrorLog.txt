@@ -1,66 +1,174 @@
 
 
 
-Sun May 06 00:37:03 2012
+Mon May 14 18:24:52 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 00:47:18 2012
+Mon May 14 18:39:22 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 00:48:50 2012
+Mon May 14 22:14:26 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 00:49:23 2012
+Mon May 14 22:49:03 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 00:54:35 2012
+Mon May 14 23:07:20 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 01:01:33 2012
+Mon May 14 23:08:11 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 01:03:09 2012
+Mon May 14 23:33:51 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 01:06:48 2012
+Mon May 14 23:58:06 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 01:10:02 2012
+Tue May 15 11:48:02 2012
 ========================
 failed to open hole.01 attempting to add .db extension
 
 
 
-Sun May 06 01:14:11 2012
+Tue May 15 11:51:05 2012
 ========================
-failed to open hole.01 attempting to add .db extension
+failed to open hole.04 attempting to add .db extension
+Error: File not Found: hole.04
+file reader failed
 
 
 
-Sun May 06 01:16:15 2012
+Tue May 15 11:53:45 2012
 ========================
-failed to open hole.01 attempting to add .db extension
+failed to open hole.04 attempting to add .db extension
+Error: File not Found: hole.04
+file reader failed
+
+
+
+Tue May 15 11:54:42 2012
+========================
+failed to open hole.04 attempting to add .db extension
+Error: File not Found: hole.04
+file reader failed
+
+
+
+Tue May 15 11:55:47 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 11:58:01 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:01:09 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:03:23 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:04:31 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:06:27 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:08:57 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:09:40 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:10:32 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:12:26 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:12:36 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:13:22 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 12:17:41 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 14:12:10 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 14:12:26 2012
+========================
+failed to open hole.04 attempting to add .db extension
+
+
+
+Tue May 15 14:51:17 2012
+========================
+failed to open hole.04 attempting to add .db extension

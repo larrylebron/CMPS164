@@ -12,6 +12,14 @@
 // Copyright (c) 2003 Song Ho Ahn
 //////////////////////////////////////////////////////////////////////////////
 
+/*Usage
+Timer time;
+time.start();
+time.getElapsedTimeinSec(); // returns seconds since start
+time.stop();
+//Other denominations are available
+*/
+
 #ifndef TIMER_H_DEF
 #define TIMER_H_DEF
 

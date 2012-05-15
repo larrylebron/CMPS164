@@ -1,8 +1,21 @@
 #include "renderManager.h"
 
+renderManager* renderManager::m_pInstance = 0;  
 
-renderManager::renderManager()
+renderManager::renderManager() {
+}
+
+/** This function is called to create an instance of the class. 
+    Calling the constructor publicly is not allowed. The constructor 
+    is private and is only called by this Instance function.
+*/  
+renderManager* renderManager::Instance()
 {
+   if (!m_pInstance) {   // Only allow one instance of class to be generated.
+      m_pInstance = new renderManager();
+   }
+
+   return m_pInstance;
 }
 
 
@@ -11,14 +24,13 @@ renderManager::~renderManager()
 	cout << "render manager destructor";
 }
 
+
 void renderManager::drawLevel(CMMPointer<level> lev) {
 	//get the level info
 	std::map<int, CMMPointer<tile>> tiles = lev->getTiles();
 	std::map<int, CMMPointer<ball>> balls = lev->getBalls();
 	std::map<int, CMMPointer<tee>> tees = lev->getTees();
 	std::map<int, CMMPointer<cup>> cups = lev->getCups();
-
-	//
 
 	std::map<int, CMMPointer<tile>>::iterator itT;
 	for ( itT=tiles.begin() ; itT != tiles.end(); itT++ ) {
@@ -34,9 +46,6 @@ void renderManager::drawLevel(CMMPointer<level> lev) {
 	for ( itC=cups.begin() ; itC != cups.end(); itC++ ) {
 		drawCup((*itC).second);
 	}
-	
-
-	
 }
 
 void renderManager::drawTile(CMMPointer<tile> t) 
@@ -58,6 +67,7 @@ void renderManager::drawTile(CMMPointer<tile> t)
 	int numEdges = t->getNumEdges();
 	int* neighbors = t->getNeighbors();
 
+	
 	for (int i = 0; i < numEdges; i++) {
 		if (neighbors[i] == 0) {
 			Vec3f start = vertices[i];
@@ -99,6 +109,21 @@ void renderManager::drawWall(Vec3f start, Vec3f end) {
 	glVertex3f(start[0], start[1] + wallHeight, start[2]);
 	glVertex3f(end[0], end[1] + wallHeight, end[2]);
 	glVertex3f(end[0], end[1], end[2]);
+	glEnd();
+}
+
+void drawPolygon(std::vector<Vec3f> vertices, Vec3f normal, Vec3f color) {
+	
+	glBegin(GL_POLYGON);
+
+	glColor3f(color[0], color[1], color[2]);
+	glNormal3f(normal[0], normal[1], normal[2]);
+	for (std::vector<Vec3f>::iterator it = vertices.begin(); it != vertices.end(); it++) {
+		Vec3f v = *it;
+		glVertex3f(v[0], v[1], v[2]);
+	}
+
+
 	glEnd();
 }
 

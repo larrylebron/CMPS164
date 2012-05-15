@@ -63,7 +63,7 @@ std::map<int, CMMPointer<tee>> level::getTees() {
 	return teesCopy;
 }
 
-std::map<int, CMMPointer<ball>> level::getBalls() {
+ std::map<int, CMMPointer<ball>> level::getBalls() {
 	std::map<int, CMMPointer<ball>>ballsCopy = balls;
 	return ballsCopy;
 }

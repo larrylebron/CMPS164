@@ -17,7 +17,8 @@ USAGE:
 		Logger* log = Logger::Instancer()
 		log->write("string message");
 */
-
+#ifndef LOGGER_H
+#define LOGGER_H
 #pragma once
 
 #include <iostream>
@@ -61,3 +62,5 @@ private:
    std::set<string> fileNames;				//The set of files that have been written to
    std::ofstream writer;
 };
+
+#endif

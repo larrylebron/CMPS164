@@ -73,9 +73,10 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 			int neighborIndex = tokens.size() - numVertices; 
 			for (int i = 0; i < numVertices; i++) {
 				// load the vertices
-				Vec3f vert = Vec3f (atof(tokens[index].c_str()),
-					atof(tokens[index + 1].c_str()),
-					atof(tokens[index + 2].c_str()));
+				Vec3f vert = 
+					Vec3f (atof(tokens[index].c_str()),
+							atof(tokens[index + 1].c_str()),
+							atof(tokens[index + 2].c_str()));
 
 				// add the vertices and the neighbor indices
 				verticesTemp[i] = vert;
@@ -94,7 +95,7 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 			Vec3f normal = bc.cross(ba).normalize();  // by right hand rule
 
 			CMMPointer<tile>* tempTile = 
-				new CMMPointer<tile>(new tile(id, numVertices, numVertices, verticesTemp, neighborsTemp, normal));
+				new CMMPointer<tile>(new tile(id, numVertices, numVertices, verticesTemp, neighborsTemp));
 
 			map->addTile(id, tempTile);
 

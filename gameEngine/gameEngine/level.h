@@ -1,5 +1,8 @@
+#ifndef LEVEL_H
+#define LEVEL_H
+
 #pragma once
-#include "util.h"
+
 #include <Windows.h>
 #include <map>
 #include <sstream>
@@ -7,7 +10,9 @@
 #include "tee.h"
 #include "ball.h"
 #include "cup.h"
+#include "Wall.h"
 #include "Logger.h"
+#include "util.h"
 
 class level : public IMMObject
 {
@@ -43,3 +48,4 @@ private:
 
 };
 
+#endif

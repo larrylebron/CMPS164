@@ -1,10 +1,6 @@
 #include "cup.h"
 
 
-cup::cup()
-{
-}
-
 cup::cup(int pID, Vec3f pPosition)
 {
 	id = pID;

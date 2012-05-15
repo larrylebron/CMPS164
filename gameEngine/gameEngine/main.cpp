@@ -7,15 +7,30 @@
 #include <Windows.h>
 #include <gl\GL.h>
 #include <gl\GLU.h>
-#include <glut.h>
+#include <gl\glut.h>
 
-#include "util.h"
 #include "level.h"
+#include "util.h"
 #include "renderManager.h"
+
+
+#include "PhysicsManager.h"
+
 #include "fileReader.h"
 #include "externalLibs\Timer.h"
 #include "Logger.h"
 
+//Frame length in seconds -- for 60 fps
+const double FRAME_TIME = .0166666666666666666666;
+
+//timer
+Timer frameTimer;
+double currTime;
+
+//The Physics manager
+PhysicsManager* pM;
+
+//List of Physics Objects
 
 //The render manager
 renderManager* rM;
@@ -25,9 +40,6 @@ CMMPointer<level> currLev;
 
 //the file reader
 fileReader* fR;
-
-//timer
-double currTime; 
 
 //camera modes
 typedef enum {
@@ -177,14 +189,17 @@ void new_frame() {
 	glMatrixMode(GL_MODELVIEW);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-
-	
+		
 	glPushMatrix();
 	glTranslatef(translate[0], translate[1], translate[2]);
 	glRotatef(rotateM[0], 1, 0, 0);
 	glRotatef(rotateM[1], 0, 1, 0);
 	glRotatef(rotateM[2], 0, 0, 1);
 	glScalef(zoom, zoom, zoom);
+
+	//process ui -- any new impulse forces?
+
+	//update simulation
 
 	rM->drawLevel(currLev);
 	glPopMatrix();
@@ -196,10 +211,10 @@ void new_frame() {
 }
 
 void cb_idle() {
-	double now = clock() / (CLOCKS_PER_SEC / 1000);
-
-	//update at 60 frames/sec
-	if ( (now - currTime) > 16) {
+	double now = frameTimer.getElapsedTime();
+	
+	//start a new frame if proper amount of time has elapsed
+	if ( (now - currTime) > FRAME_TIME) {
 		currTime = now;
 		new_frame();
 	}
@@ -428,21 +443,22 @@ int main(int argc, char** argv) {
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 	
-	//initialize random number generator and timer
+	//initialize random number generator
 	srand((unsigned)time(0)); 
-	currTime = clock() / (CLOCKS_PER_SEC / 1000);
 
 	//initialize render Manager
-	rM = new renderManager();
+	rM = renderManager::Instance();
+
+	pM = PhysicsManager::Instance();
+
+	//Start the timer
+	frameTimer.start();
+	currTime = 0;
 
 	//for debugging
 	Logger* log = Logger::Instance();
-
+	
 	glutMainLoop();
-
-	delete currLev;
-	delete rM;
-	IMMObject::CollectRemainingObjects(); //not sure if this will kick in after glut quits
 
 	return 0;
 }
