@@ -7,7 +7,7 @@
 #include <gl\GL.h>
 #include <gl\GLU.h>
 #include <gl\glut.h>
-#include "externalLibs\mmanager.h"
+#include "util.h"
 #include "level.h"
 
 class renderManager
