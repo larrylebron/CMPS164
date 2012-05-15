@@ -42,12 +42,12 @@ void renderManager::drawLevel(CMMPointer<level> lev) {
 void renderManager::drawTile(CMMPointer<tile> t) 
 {
 	GLfloat tileColor[3] = { 0.0f, 0.9f, 0.0f };
-	glColor3fv(tileColor);
 	Vec3f normal = t->getNormal();
 	Vec3f* vertices = t->getVertices();
 	int numVerts = t->getNumVertices();
 
 	glBegin(GL_POLYGON);
+		glColor3fv(tileColor);
 		glNormal3f(normal[0], normal[1], normal[2]);
 		for (int i = 0; i < numVerts; i++)
 		{
@@ -64,6 +64,10 @@ void renderManager::drawTile(CMMPointer<tile> t)
 			Vec3f end = (i == numEdges - 1) ? vertices[0] : vertices[i+1];
 			drawWall(start, end);
 		}
+	}
+
+	if (t->getId() == 1) {
+		cout << endl;
 	}
 }
 

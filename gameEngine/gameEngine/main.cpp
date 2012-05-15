@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include <gl\GL.h>
 #include <gl\GLU.h>
-#include <glut.h>
+#include <gl\glut.h>
 
 #include "util.h"
 #include "level.h"
