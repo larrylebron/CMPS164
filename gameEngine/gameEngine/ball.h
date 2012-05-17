@@ -12,6 +12,7 @@ public:
 	ball::ball(int pID, Vec3f pPosition);
 	~ball();
 	Vec3f getPosition();
+	void setPosition(Vec3f vec);
 	Vec3f getVelocity();
 	string toString();
 	void draw();

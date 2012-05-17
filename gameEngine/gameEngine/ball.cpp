@@ -17,6 +17,10 @@ Vec3f ball::getPosition() {
 	return posCopy;
 }
 
+void ball::setPosition(Vec3f vec) {
+	position = vec;
+}
+
 Vec3f ball::getVelocity() {
 	Vec3f velCopy = velocity;
 	return velCopy;
