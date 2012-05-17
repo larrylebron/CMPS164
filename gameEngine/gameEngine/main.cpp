@@ -49,6 +49,8 @@ typedef enum {
 	CAMERA_PAN,
 	CAMERA_ZOOM,
 	CAMERA_ROTATE,
+	PLAY_GAME,
+	SHOW_PATH,
 	NUM_MODES,
 } mode;
 
@@ -106,6 +108,9 @@ float cameraFOV = 45.0f;
 float cameraZNear = 1.0f;
 float cameraZFar = 200.f;
 float cameraRotationDullFactor = 2.0f;
+float cameraTimeStep = 0.00001f;
+float cameraCurrent = 0.0f;
+Vec3f cameraPath;
 
 // Camera and Light Variables
 GLfloat lightColor[]	= {1.0f, 1.0f, 1.0f, 1.0f};
@@ -158,7 +163,7 @@ void updateCameraDirection() {
 	// first calculation is made from the neutral cameraDirection
 	rotatedCameraDirection = Vec3f(cameraDirection[0] * cos(yAngle) + cameraDirection[2] * sin(yAngle), cameraDirection[1], cameraDirection[2] * cos(yAngle) - cameraDirection[0] * sin(yAngle)); // rotate about y
 	rotatedCameraDirection = Vec3f(rotatedCameraDirection[0], rotatedCameraDirection[1] * cos(xAngle) - rotatedCameraDirection[2] * sin(xAngle), rotatedCameraDirection[2] * cos(xAngle) + rotatedCameraDirection[1] * sin(xAngle)); // rotate about x
-	// rotatedCameraDirection = Vec3f(rotatedCameraDirection[0] * cos(zAngle) - rotatedCameraDirection[1] * sin(zAngle), rotatedCameraDirection[1] * cos(zAngle) + rotatedCameraDirection[0] * sin(zAngle), rotatedCameraDirection[2]); // rotate about z
+	rotatedCameraDirection = Vec3f(rotatedCameraDirection[0] * cos(zAngle) - rotatedCameraDirection[1] * sin(zAngle), rotatedCameraDirection[1] * cos(zAngle) + rotatedCameraDirection[0] * sin(zAngle), rotatedCameraDirection[2]); // rotate about z
 	rotatedCameraUp = Vec3f(cameraUp[0] * cos(zAngle) - cameraUp[1] * sin(zAngle), cameraUp[1] * cos(zAngle) + cameraUp[0] * sin(zAngle), cameraUp[2]); // cameraUp
 }
 
@@ -175,8 +180,21 @@ void updateCamera(int w = viewportWidth, int h = viewportHeight) {
 	std::map<int, CMMPointer<ball>> ballMap = currLev->getBalls();
 	Vec3f ballPos = ballMap.begin()->second->getPosition();
 	Vec3f destination = cameraPan + rotatedCameraDirection;
-	gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], destination[0], destination[1], destination[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
-	//gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], ballPos[0], ballPos[1], ballPos[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
+	if (currentMode == PLAY_GAME) {
+		gluLookAt(ballPos[0], ballPos[1] + 5.0f, ballPos[2], ballPos[0], ballPos[1], ballPos[2], 0.0f, 0.0f, -1.0f);
+	}
+	else if (currentMode == SHOW_PATH) {
+		Vec3f camPos = ballPos + (cameraPath * cameraCurrent);
+		gluLookAt(camPos[0], camPos[1] + 5.0f, camPos[2], camPos[0], camPos[1], camPos[2], 0.0f, 0.0f, -1.0f);
+		
+		if (cameraCurrent <= 1.0f){
+			cameraCurrent += cameraTimeStep;
+		} else {
+			//currentMode == PLAY_GAME;
+		}
+	} else {
+		gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], destination[0], destination[1], destination[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
+	}
 	
 	glutPostRedisplay();
 }
@@ -224,7 +242,17 @@ void cb_idle() {
 }
 
 void cb_display() {
-	glutPostRedisplay();
+	if (currentMode == PLAY_GAME) {
+		std::map<int, CMMPointer<ball>> ballMap = currLev->getBalls();
+		Vec3f ballCurrPos = ballMap.begin()->second->getPosition();
+		Vec3f newPos = ballCurrPos + Vec3f(0.00001f, 0.0f, -0.00001f);
+		ballMap.begin()->second->setPosition(newPos);	
+		updateCamera();
+	} else if (currentMode == SHOW_PATH) {
+		updateCamera();
+	} else {
+		glutPostRedisplay();
+	}
 }
 
 
@@ -284,6 +312,9 @@ void cb_motion( int x, int y )
 		cameraRotate[0] -= (float) ( y - mouse_y ) / y_ratchet * cameraRotationDullFactor;
 		cameraRotate[1] += (float) ( x - mouse_x ) / x_ratchet * cameraRotationDullFactor;
 		break;
+	case PLAY_GAME: SHOW_PATH:
+		// no commands
+		break;
 	}
 
 	// Update cursor position
@@ -318,7 +349,22 @@ void handleUpDown(int direction)
 	case CAMERA_ROTATE:
 		cameraRotate[2] += direction * cameraRotationDullFactor;
 		break;
+	case PLAY_GAME:
+		// up down used to adjust angles
+		break;
+	case SHOW_PATH:
+		// no commands
+		break;
 	}
+}
+
+void resetCameraPath() {
+	cameraCurrent = 0.0f;
+	std::map<int, CMMPointer<ball>> ballMap = currLev->getBalls();
+	Vec3f ballPos = ballMap.begin()->second->getPosition();
+	std::map<int, CMMPointer<cup>> cupMap = currLev->getCups();
+	Vec3f cupPos = cupMap.begin()->second->getPosition();
+	cameraPath = cupPos - ballPos;
 }
 
 void handle_menu( int ID ) {
@@ -343,7 +389,15 @@ void handle_menu( int ID ) {
 	case 5: // cammera rotate X
 		currentMode = CAMERA_ROTATE;
 		break;
-	case 6: // Quit
+	case 6:
+		currentMode = PLAY_GAME;
+		break;
+	case 7:
+		// calculate path
+		resetCameraPath();
+		currentMode = SHOW_PATH;
+		break;
+	case 8: // Quit
 		exit(0);
 		break;
 	}
@@ -388,7 +442,7 @@ int main(int argc, char** argv) {
 
 	//Initialize fileReader, read in file, quit if reader fails
 	fR = new fileReader();
-	if( !fR->readFile(argv[2], currLev) ) {
+	if( !fR->readFile("hole.01.db", currLev) ) {
 		Logger::Instance()->err("file reader failed");
 		return(1);
 	}
@@ -410,13 +464,15 @@ int main(int argc, char** argv) {
 
 	// Right Click Menu
 	glutCreateMenu( handle_menu );	// Setup GLUT popup menu
-	glutAddMenuEntry( "Translate", 0);
-	glutAddMenuEntry( "Rotate", 1);
-	glutAddMenuEntry( "Zoom", 2);
-	glutAddMenuEntry( "Camera Pan", 3);
-	glutAddMenuEntry( "Camera Zoom", 4);
-	glutAddMenuEntry( "Camera Rotate", 5);
-	glutAddMenuEntry( "Quit", 6);
+	glutAddMenuEntry( "Free Look - Translate", 0);
+	glutAddMenuEntry( "Free Look - Rotate", 1);
+	glutAddMenuEntry( "Free Look - Zoom", 2);
+	glutAddMenuEntry( "Free Look - Camera Pan", 3);
+	glutAddMenuEntry( "Free Look - Camera Zoom", 4);
+	glutAddMenuEntry( "Free Look - Camera Rotate", 5);
+	glutAddMenuEntry( "Play Game", 6);
+	glutAddMenuEntry( "Show Path from Ball to Cup", 7);
+	glutAddMenuEntry( "Quit", 8);
 	glutAttachMenu( GLUT_RIGHT_BUTTON );
 	cout << instructions[currentMode] << endl;
 
