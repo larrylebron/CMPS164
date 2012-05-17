@@ -200,6 +200,7 @@ void new_frame() {
 	//process ui -- any new impulse forces?
 
 	//update simulation
+	currLev->getCurrTile();
 
 	rM->drawLevel(currLev);
 	glPopMatrix();

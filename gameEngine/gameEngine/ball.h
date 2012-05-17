@@ -5,6 +5,7 @@
 #include "util.h"
 #include <vector>
 #include "externalLibs\vec3f.h"
+#include "tile.h"
 class ball :
 	public IMMObject
 {

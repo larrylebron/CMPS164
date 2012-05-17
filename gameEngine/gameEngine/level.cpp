@@ -73,6 +73,21 @@ std::map<int, CMMPointer<cup>> level::getCups() {
 	return cupsCopy;
 }
 
+CMMPointer<tile> level::getCurrTile() {
+	//get the ball's position -- assumes only one ball
+	Vec3f ballPos = (*balls.begin()).second->getPosition();
+
+	//check through the tiles to see if they contain the ball's position
+	std::map<int, CMMPointer<tile>>::iterator it;
+	for ( it=tiles.begin() ; it != tiles.end(); it++ ) {
+		CMMPointer<tile> checkTile = (*it).second;
+		if ( checkTile->containsPoint(ballPos) ) return checkTile; //return pointer to current tile
+	}
+
+	Logger::Instance()->err("Ball not on any tile");
+	return CMMPointer<tile>(); //return a void pointer
+}
+
 bool level::checkLevel() {
 	//check the tiles to ensure all neighbors exist
 	std::map<int, CMMPointer<tile>>::iterator it;
@@ -105,6 +120,7 @@ bool level::checkLevel() {
 	}
 	return true;
 }
+
 string level::toString() {
 	return "level info";
 	/*

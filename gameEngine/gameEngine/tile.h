@@ -28,6 +28,7 @@ public:
 	int getNumEdges();
 	int* getNeighbors(); //return a copy of the array of neighbors
 	int getId();
+	bool containsPoint(Vec3f p); //returns true if the tile contains point p
 	~tile();
 
 	//print info about this tile
@@ -42,6 +43,11 @@ private:
 	int numEdges;
 	std::vector< CMMPointer<Wall> > walls; //the walls surrounding the tile
 	Vec3f normal;
+
+	void initBounds();//initialize the simple bounds vectors
+	Vec3f minBounds; // contains the minimum x, y, z vertex values
+	Vec3f maxBounds; // contains the maximum x, y, z vertex values
+	Logger* log;
 };
 
 #endif

@@ -32,6 +32,7 @@ public:
 
 	//Check the level to confirm it's valid
 	bool checkLevel();
+	CMMPointer<tile> getCurrTile();
 
 	string toString(); //print info about the tiles in the level
 	AUTO_SIZE;
