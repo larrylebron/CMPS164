@@ -11,7 +11,6 @@
 
 #include "level.h"
 #include "util.h"
-#include "renderManager.h"
 
 
 #include "PhysicsManager.h"
@@ -27,13 +26,7 @@ const double FRAME_TIME = .0166666666666666666666;
 Timer frameTimer;
 double currTime;
 
-//The Physics manager
-PhysicsManager* pM;
-
 //List of Physics Objects
-
-//The render manager
-renderManager* rM;
 
 //The current level
 CMMPointer<level> currLev;
@@ -177,8 +170,7 @@ void updateCamera(int w = viewportWidth, int h = viewportHeight) {
 		updateCameraDirection();
 	}
 
-	std::map<int, CMMPointer<ball>> ballMap = currLev->getBalls();
-	Vec3f ballPos = ballMap.begin()->second->getPosition();
+	Vec3f ballPos = currLev->getBallPos();
 	Vec3f destination = cameraPan + rotatedCameraDirection;
 	if (currentMode == PLAY_GAME) {
 		gluLookAt(ballPos[0], ballPos[1] + 5.0f, ballPos[2], ballPos[0], ballPos[1], ballPos[2], 0.0f, 0.0f, -1.0f);
@@ -217,10 +209,11 @@ void new_frame() {
 
 	//process ui -- any new impulse forces?
 
-	//update simulation
-	currLev->getCurrTile();
+	//update the ball simulation
+	currLev->getBall()->doSimulation(currTime);
 
-	rM->drawLevel(currLev);
+	currLev->update();
+
 	glPopMatrix();
 	
 	
@@ -243,10 +236,6 @@ void cb_idle() {
 
 void cb_display() {
 	if (currentMode == PLAY_GAME) {
-		std::map<int, CMMPointer<ball>> ballMap = currLev->getBalls();
-		Vec3f ballCurrPos = ballMap.begin()->second->getPosition();
-		Vec3f newPos = ballCurrPos + Vec3f(0.00001f, 0.0f, -0.00001f);
-		ballMap.begin()->second->setPosition(newPos);	
 		updateCamera();
 	} else if (currentMode == SHOW_PATH) {
 		updateCamera();
@@ -360,10 +349,8 @@ void handleUpDown(int direction)
 
 void resetCameraPath() {
 	cameraCurrent = 0.0f;
-	std::map<int, CMMPointer<ball>> ballMap = currLev->getBalls();
-	Vec3f ballPos = ballMap.begin()->second->getPosition();
-	std::map<int, CMMPointer<cup>> cupMap = currLev->getCups();
-	Vec3f cupPos = cupMap.begin()->second->getPosition();
+	Vec3f ballPos = currLev->getBallPos();
+	Vec3f cupPos = currLev->getCupPos();
 	cameraPath = cupPos - ballPos;
 }
 
@@ -391,6 +378,8 @@ void handle_menu( int ID ) {
 		break;
 	case 6:
 		currentMode = PLAY_GAME;
+		//hack set the ball's velocity to make it move
+		currLev->getBall()->setVelocity(Vec3f(.2, 0, -.2));
 		break;
 	case 7:
 		// calculate path
@@ -442,7 +431,7 @@ int main(int argc, char** argv) {
 
 	//Initialize fileReader, read in file, quit if reader fails
 	fR = new fileReader();
-	if( !fR->readFile("hole.01.db", currLev) ) {
+	if( !fR->readFile(argv[2], currLev) ) {
 		Logger::Instance()->err("file reader failed");
 		return(1);
 	}
@@ -503,11 +492,6 @@ int main(int argc, char** argv) {
 	//initialize random number generator
 	srand((unsigned)time(0)); 
 
-	//initialize render Manager
-	rM = renderManager::Instance();
-
-	pM = PhysicsManager::Instance();
-
 	//Start the timer
 	frameTimer.start();
 	currTime = 0;
@@ -519,9 +503,3 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
-
-
-
-
-
-

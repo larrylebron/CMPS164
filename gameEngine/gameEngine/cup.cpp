@@ -1,15 +1,23 @@
 #include "cup.h"
 
 
-cup::cup(int pID, Vec3f pPosition)
+cup::cup(int pID, Vec3f pPosition, Vec3f pColor, float pRadius)
+	: GameObject(pID), Drawable(pColor)
 {
-	id = pID;
+
 	position = pPosition;
+	radius = pRadius;
 }
 
 
 cup::~cup()
 {
+}
+
+
+
+void cup::draw() {
+	renderManager::Instance()->drawSphere(radius, normal, position, color);
 }
 
 Vec3f cup::getPosition() {

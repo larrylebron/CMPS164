@@ -1,8 +1,8 @@
 #include "tee.h"
 
 tee::tee(int pID, Vec3f pPosition)
+	: GameObject(pID)
 {
-	id = pID;
 	position = pPosition;
 }
 

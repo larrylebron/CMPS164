@@ -3,25 +3,27 @@
 
 #pragma once
 #include "util.h"
-#include <vector>
-#include "externalLibs\vec3f.h"
-#include "tile.h"
+#include "Drawable.h"
+#include "GameObject.h"
+#include "Simulated.h"
 class ball :
-	public IMMObject
+	public GameObject, Drawable, Simulated
 {
 public:
-	ball::ball(int pID, Vec3f pPosition);
+	ball::ball(int pID, Vec3f pPosition, Vec3f color, float pRadius);
 	~ball();
 	Vec3f getPosition();
-	void setPosition(Vec3f vec);
+	void setVelocity(Vec3f pVelocity);
 	Vec3f getVelocity();
-	string toString();
 	void draw();
+	void doSimulation(float currTime); //handle ball movement at currTime in seconds
+	void setCurrSurfaceNormal(Vec3f pNormal); //set the ball's current surface normal
+	string toString();	
 	AUTO_SIZE;
 private:
-	int id;
 	Vec3f position;
-	Vec3f velocity;
+	float radius;
+	Vec3f currSurfaceNormal; //the normal for the ball's current surface
 };
 
 #endif

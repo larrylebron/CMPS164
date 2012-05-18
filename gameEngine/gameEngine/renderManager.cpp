@@ -24,7 +24,7 @@ renderManager::~renderManager()
 	cout << "render manager destructor";
 }
 
-
+/*
 void renderManager::drawLevel(CMMPointer<level> lev) {
 	//get the level info
 	std::map<int, CMMPointer<tile>> tiles = lev->getTiles();
@@ -115,8 +115,9 @@ void renderManager::drawWall(Vec3f start, Vec3f end) {
 	glVertex3f(end[0], end[1], end[2]);
 	glEnd();
 }
+*/
 
-void drawPolygon(std::vector<Vec3f> vertices, Vec3f normal, Vec3f color) {
+void renderManager::drawPolygon(std::vector<Vec3f> vertices, Vec3f normal, Vec3f color) {
 	
 	glBegin(GL_POLYGON);
 
@@ -126,8 +127,19 @@ void drawPolygon(std::vector<Vec3f> vertices, Vec3f normal, Vec3f color) {
 		Vec3f v = *it;
 		glVertex3f(v[0], v[1], v[2]);
 	}
-
-
+	
 	glEnd();
+}
+
+void renderManager::drawSphere(float radius, Vec3f normal, Vec3f position, Vec3f color) {
+	
+	GLfloat sphereColor[3] = { color[0], color[1], color[2] };
+	glColor3fv(sphereColor);
+	glNormal3f(normal[0], normal[1], normal[2]);
+
+	glPushMatrix();
+	glTranslatef(position[0], position[1], position[2]);
+	glutSolidSphere(radius, 10, 10); //our default params for sphere quality
+	glPopMatrix();
 }
 

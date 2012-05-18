@@ -6,6 +6,8 @@
 #include <Windows.h>
 #include <map>
 #include <sstream>
+#include "Drawable.h"
+#include "GameObject.h"
 #include "tile.h"
 #include "tee.h"
 #include "ball.h"
@@ -24,15 +26,15 @@ public:
 	void addTee(int pId, CMMPointer<tee>* pTee);
 	void addCup(int pId, CMMPointer<cup>* pCup);
 
-	//get the maps
-	std::map<int, CMMPointer<tile>> getTiles();
-	std::map<int, CMMPointer<ball>> getBalls();
-	std::map<int, CMMPointer<tee>> getTees();
-	std::map<int, CMMPointer<cup>> getCups();
-
+	CMMPointer<ball> getBall();
+	//get the positions -- currently assumes only a single ball & cup
+	Vec3f getBallPos();
+	Vec3f getCupPos();
+	
 	//Check the level to confirm it's valid
 	bool checkLevel();
 	CMMPointer<tile> getCurrTile();
+	void update(); //update the level and draw
 
 	string toString(); //print info about the tiles in the level
 	AUTO_SIZE;

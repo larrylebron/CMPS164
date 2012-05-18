@@ -17,6 +17,7 @@
     <ClCompile Include="externalLibs\Timer.cpp" />
     <ClCompile Include="externalLibs\vec3f.cpp" />
     <ClCompile Include="fileReader.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="level.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
@@ -29,14 +30,17 @@
   <ItemGroup>
     <ClInclude Include="ball.h" />
     <ClInclude Include="cup.h" />
+    <ClInclude Include="Drawable.h" />
     <ClInclude Include="externalLibs\mmanager.h" />
     <ClInclude Include="externalLibs\Timer.h" />
     <ClInclude Include="externalLibs\vec3f.h" />
     <ClInclude Include="fileReader.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="level.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="renderManager.h" />
+    <ClInclude Include="Simulated.h" />
     <ClInclude Include="tee.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="util.h" />

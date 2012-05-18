@@ -29,3 +29,7 @@ Vec3f PhysicsManager::calcForces() {
 	return result;
 }
 
+Vec3f PhysicsManager::calcPosition(Vec3f position, Vec3f velocity, float timeElapsed) {
+	return position + velocity * timeElapsed; //closed form projectile equation of motion
+}
+

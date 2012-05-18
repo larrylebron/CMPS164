@@ -66,8 +66,8 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 				return false;
 			}
 
-			Vec3f* verticesTemp = new Vec3f[numVertices];
-			int* neighborsTemp = new int[numVertices];
+			vector<Vec3f> verticesTemp;
+			vector<int> neighborsTemp;
 
 			int index = 3;
 			int neighborIndex = tokens.size() - numVertices; 
@@ -79,28 +79,18 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 							atof(tokens[index + 2].c_str()));
 
 				// add the vertices and the neighbor indices
-				verticesTemp[i] = vert;
-				neighborsTemp[i] = atoi(tokens[neighborIndex].c_str());
+				verticesTemp.push_back(vert);
+				neighborsTemp.push_back( atoi(tokens[neighborIndex].c_str()) );
 
 				index += 3;
 				neighborIndex ++;
 			}
 
-			// calculate normal
-			Vec3f a = verticesTemp[0];
-			Vec3f b = verticesTemp[1];
-			Vec3f c = verticesTemp[2];
-			Vec3f ba = a - b;
-			Vec3f bc = c - a;
-			Vec3f normal = bc.cross(ba).normalize();  // by right hand rule
-
 			CMMPointer<tile>* tempTile = 
-				new CMMPointer<tile>(new tile(id, numVertices, numVertices, verticesTemp, neighborsTemp));
+				new CMMPointer<tile>(new tile(id, verticesTemp, neighborsTemp, TILE_COLOR));
 
 			map->addTile(id, tempTile);
 
-			delete[] verticesTemp;
-			delete[] neighborsTemp;
 			tempTile = 0;
 			delete tempTile;
 			
@@ -110,7 +100,7 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 			Vec3f position(atof(tokens[2].c_str()),
 					atof(tokens[3].c_str()),
 					atof(tokens[4].c_str()));
-			CMMPointer<cup>* tempCup = new CMMPointer<cup>(new cup(id, position));
+			CMMPointer<cup>* tempCup = new CMMPointer<cup>(new cup(id, position, CUP_COLOR, CUP_RADIUS));
 			map->addCup(id, tempCup);
 			tempCup = 0;
 			delete tempCup;
@@ -124,7 +114,7 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 			map->addTee(id, tempTee);
 
 			//add a ball in the location of the tee
-			CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(id, position));
+			CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(id, position, BALL_COLOR, BALL_RADIUS));
 			map->addBall(id, tempBall);
 
 			tempTee = 0;

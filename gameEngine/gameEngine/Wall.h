@@ -2,13 +2,12 @@
 #define WALL_H
 
 #pragma once
-#include <vector>
-//#include "renderManager.h" //this is causing compile errors for some reason
-#include "externalLibs\mmanager.h"
-#include "externalLibs\vec3f.h"
+#include "util.h"
+#include "Drawable.h"
+#include "GameObject.h"
 
 class Wall :
-	public IMMObject
+	public GameObject, Drawable
 {
 public:
 	//initialize with start, end, height and color
@@ -18,12 +17,9 @@ public:
 	string toString();
 	AUTO_SIZE;
 private:
-	int id;
-	static int numWalls;
-	void initNormal();
+	static int wallIdCount;//counter for wall ids
+	Vec3f calcNormal();
 	std::vector<Vec3f> vertices; //the vertices comprising this wall
-	Vec3f normal; //the normal of the wall
-	Vec3f color; //the color of the wall
 	float height; //height of the wall
 };
 

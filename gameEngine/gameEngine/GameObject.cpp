@@ -1,11 +1,12 @@
 #include "GameObject.h"
 
 
-GameObject::GameObject(void)
-{
+GameObject::GameObject(int pID, Vec3f pNormal){
+	id = pID;
+	normal = pNormal;
 }
 
 
-GameObject::~GameObject(void)
-{
+int GameObject::getID() {
+	return id;
 }

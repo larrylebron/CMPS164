@@ -3,9 +3,9 @@
 
 #pragma once
 #include "util.h"
-#include "externalLibs\vec3f.h"
+#include "GameObject.h"
 class tee :
-	public IMMObject
+	public GameObject
 {
 public:
 	tee(int pID, Vec3f pPosition);
@@ -14,7 +14,6 @@ public:
 	string toString();
 	AUTO_SIZE;
 private:
-	int id;
 	Vec3f position;
 };
 

@@ -3,18 +3,23 @@
 
 #pragma once
 #include "util.h"
-#include "externalLibs\vec3f.h"
-class cup : public IMMObject
+#include "Drawable.h"
+#include "GameObject.h"
+
+class cup : public GameObject, Drawable
 {
 public:
-	cup(int pID, Vec3f pPosition);
+	cup(int pID, Vec3f pPosition, Vec3f pColor, float pRadius);
 	~cup();
 	Vec3f getPosition();
+	void draw();
 	string toString();
 	AUTO_SIZE;
 private:
-	int id;
+
+
 	Vec3f position;
+	float radius;
 };
 
 #endif

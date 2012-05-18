@@ -53,29 +53,22 @@ void level::addCup(int pId, CMMPointer<cup>* pCup) {
 	cups[pId] = *pCup;
 }
 
-std::map<int, CMMPointer<tile>> level::getTiles() {
-	std::map<int, CMMPointer<tile>>tilesCopy = tiles;
-	return tilesCopy;
+CMMPointer<ball> level::getBall() {
+	return (*balls.begin()).second;
 }
 
-std::map<int, CMMPointer<tee>> level::getTees() {
-	std::map<int, CMMPointer<tee>>teesCopy = tees;
-	return teesCopy;
+Vec3f level::getBallPos() {
+	return (*balls.begin()).second->getPosition();
 }
 
- std::map<int, CMMPointer<ball>> level::getBalls() {
-	std::map<int, CMMPointer<ball>>ballsCopy = balls;
-	return ballsCopy;
+Vec3f level::getCupPos() {
+	return (*cups.begin()).second->getPosition();
 }
 
-std::map<int, CMMPointer<cup>> level::getCups() {
-	std::map<int, CMMPointer<cup>>cupsCopy = cups;
-	return cupsCopy;
-}
 
 CMMPointer<tile> level::getCurrTile() {
 	//get the ball's position -- assumes only one ball
-	Vec3f ballPos = (*balls.begin()).second->getPosition();
+	Vec3f ballPos = getBallPos();
 
 	//check through the tiles to see if they contain the ball's position
 	std::map<int, CMMPointer<tile>>::iterator it;
@@ -96,12 +89,12 @@ bool level::checkLevel() {
 		
 		t = it->second;
 		int n = t->getNumEdges();
-		int* neighbors = t->getNeighbors();
+		vector<int> neighbors = t->getNeighbors();
 		
 		for(int i = 0; i < n; i++) {
 			if (neighbors[i] != 0 && tiles.find(neighbors[i]) == tiles.end() ) {
 				std::stringstream msg;
-				msg << "Neighbor " << i << " in tile id" << t->getId() << " is invalid";
+				msg << "Neighbor " << i << " in tile id " << t->getID() << " is invalid";
 				Logger::Instance()->err(msg.str());
 				return false;
 			}
@@ -119,6 +112,25 @@ bool level::checkLevel() {
 		return false;
 	}
 	return true;
+}
+
+void level::update() {
+	std::map<int, CMMPointer<tile>>::iterator it;
+	for ( it=tiles.begin(); it != tiles.end(); it++ ) {
+		//print info for the tile pointed at by the CMMPointer
+		(*it).second->draw();
+	}
+	
+	std::map<int, CMMPointer<ball>>::iterator itB;
+	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
+		(*itB).second->draw();
+	}
+	
+	std::map<int, CMMPointer<cup>>::iterator itC;
+	for ( itC=cups.begin(); itC != cups.end(); itC++ ) {
+		(*itC).second->draw();
+	}
+
 }
 
 string level::toString() {

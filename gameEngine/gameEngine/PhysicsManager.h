@@ -19,6 +19,9 @@ public:
    //Pass in a list of forces, and return the result
    Vec3f calcForces();
 
+   //calculate new position given initial position, velocity and time elapsed
+   Vec3f calcPosition(Vec3f position, Vec3f velocity, float timeElapsed);
+
 private:
 	PhysicsManager(); //private constructor for singleton
 	static PhysicsManager* m_pInstance; //static instance of the manager

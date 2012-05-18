@@ -1,61 +1,52 @@
 #include "tile.h"
 
-tile::~tile()
-{
-	if (vertices) delete[] vertices;
-	if (neighbors) delete[] neighbors;
+tile::~tile(){
 }
 
-tile::tile(int pID, int pNumVerts, int pNumEdges, Vec3f* pVertices, int* pNeighbors)
+tile::tile(int pID, vector<Vec3f> pVertices, vector<int> pNeighbors, Vec3f pColor)
+	: GameObject(id), Drawable (pColor)
 {
 	log = Logger::Instance();
-	id = pID;
-	numVertices = pNumVerts;
-	numEdges = pNumEdges;
 
-	vertices = new Vec3f[numVertices];
-	for (int i = 0; i < numVertices; i++) {
-		vertices[i] = pVertices[i];
-	}
-	neighbors = new int[numEdges];
-	for (int i = 0; i < numEdges; i++) {
-		neighbors[i] = pNeighbors[i];
-	}
+	vertices = pVertices;
+	neighbors = pNeighbors;
 
-	initNormal();
 	initBounds(); //initialize min/max bound vectors for quick point testing
+	normal = calcNormal(); //initialize the normal
+	buildWalls();
+}
 
-	//Build walls
-	for (int i = 0; i < numEdges; i++) {
+void tile::buildWalls() {
+	for (int i = 0; i < neighbors.size(); i++) {
 		if (neighbors[i] == 0) {
 			Vec3f start = vertices[i];
 			//It might be connecting the last vertex with the first one
-			Vec3f end = (i == numEdges - 1) ? vertices[0] : vertices[i+1];
+			Vec3f end = (i == vertices.size() - 1) ? vertices[0] : vertices[i+1];
 			CMMPointer<Wall> tempWall = new Wall(start, end, WALL_HEIGHT, WALL_COLOR );
 			walls.push_back(tempWall);
 		}
 	}
 }
 
-void tile::initNormal() {
+Vec3f tile::calcNormal() {
 
-	normal = Vec3f(0,0,0);
+	Vec3f tNormal = Vec3f(0,0,0);
 
-	for (int i = 0; i < numVertices; i++) {
+	for (int i = 0; i < vertices.size(); i++) {
 		Vec3f current = vertices[i];
-		Vec3f next = vertices[ (i+1) % numVertices]; //allows for calculation of last edge to connect to 1st vert
+		Vec3f next = vertices[ (i+1) % vertices.size()]; //allows for calculation of last edge to connect to 1st vert
 	
-		normal[0] += (current[1] - next[1]) * (current[2] + next[2]);
-		normal[1] += (current[2] - next[2]) * (current[0] + next[0]);
-		normal[2] += (current[0] - next[0]) * (current[1] + next[1]);
+		tNormal[0] += (current[1] - next[1]) * (current[2] + next[2]);
+		tNormal[1] += (current[2] - next[2]) * (current[0] + next[0]);
+		tNormal[2] += (current[0] - next[0]) * (current[1] + next[1]);
 	}
-
-	normal = normal.normalize();
+	
+	return tNormal.normalize();
 }
 
 void tile::initBounds() {
 	minBounds = maxBounds = vertices[0];
-	for (int i = 0; i < numVertices; i++) {
+	for (int i = 0; i < vertices.size(); i++) {
 		Vec3f v = vertices[i];
 
 		if (v[0] < minBounds[0]) minBounds[0] = v[0]; //new min x
@@ -77,18 +68,27 @@ bool tile::containsPoint(Vec3f p) {
 
 	//check p against infinite plane
 	if ( p.dot(normal) != vertices[0].dot(normal) ) return false;
+	
 
 	//Check p against finite plane's dimensions
 	//The following code is adapted from Randolph Franklin's http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#3D%20Polygons
 
   int i, j = 0;
   bool in = false;
-  for (i = 0, j = numVertices-1; i < numVertices; j = i++) {
+  for (i = 0, j = vertices.size()-1; i < vertices.size(); j = i++) {
     if ( ((vertices[i][2]>p[2]) != (vertices[j][2]>p[2])) &&
 	 (p[0] < (vertices[j][0]-vertices[i][0]) * (p[2]-vertices[i][2]) / (vertices[j][2]-vertices[i][2]) + vertices[i][0]) )
        in = !in;
   }
   return in;
+}
+
+void tile::draw() {
+	renderManager::Instance()->drawPolygon(vertices, normal, color);
+
+	for (int i = 0; i < walls.size(); i++) {
+		walls[i]->draw();
+	}
 }
 
 Vec3f tile::getNormal() 
@@ -97,38 +97,18 @@ Vec3f tile::getNormal()
 	return nCopy;
 }
 
-Vec3f* tile::getVertices() 
-{
-	Vec3f* vCopy= new Vec3f[numVertices];
-	for (int i = 0; i < numVertices; i++) {
-		vCopy[i] = vertices[i];
-	}
+vector<Vec3f> tile::getVertices() {
+	vector<Vec3f> vCopy = vertices;
 	return vCopy;
 }
 
-int tile::getNumVertices() 
-{
-	int cNumVerts = numVertices;
-	return cNumVerts;
-}
-
-int tile::getNumEdges() 
-{
-	int cNumEdges = numEdges;
-	return cNumEdges;
-}
-
-int* tile::getNeighbors(){
-	int* nCopy= new int[numEdges];
-	for (int i = 0; i < numEdges; i++) {
-		nCopy[i] = neighbors[i];
-	}
+vector<int> tile::getNeighbors(){
+	vector<int> nCopy = neighbors;
 	return nCopy;
 }
 
-int tile::getId() {
-	int cId = id;
-	return cId;
+int tile::getNumEdges() {
+	return neighbors.size();
 }
 
 string tile::toString() {
@@ -138,8 +118,8 @@ string tile::toString() {
 	return ss.str();
 	/*
 	cout << "tile id: " << id << endl;
-	cout << "numVerts: " << numVertices << endl;
-	for (int i = 0; i < numVertices; i++) {
+	cout << "numVerts: " << vertices.size() << endl;
+	for (int i = 0; i < vertices.size(); i++) {
 		cout << vertices[i] << endl;
 	}
 	cout << "NumEdges: " << numEdges << endl;
