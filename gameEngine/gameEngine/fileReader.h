@@ -11,8 +11,6 @@
 #include "level.h"
 
 using std::ifstream;
-using std::cerr;
-using std::vector;
 
 
 static const string DataTypeTile = "tile";

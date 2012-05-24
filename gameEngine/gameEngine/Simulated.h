@@ -5,10 +5,16 @@
 class Simulated
 {
 public:
+	Simulated();
 	virtual ~Simulated(void){}
-	virtual void doSimulation(float currTime) = 0; //must implement a physics simulation
+	virtual void doSimulation() = 0; //must implement a physics simulation
+	Vec3f getVelocity(){return velocity;}
+	void setVelocity(Vec3f pVelocity) {velocity = pVelocity;}
 protected:
 	Vec3f velocity;
-	float lastFrameTime; //in seconds
+	double lastFrameTime; //in seconds
+	Timer timer;//timer for frame calculation
+	bool resolveCollision; //flag that indicates a future collision has been detected
+	PhysicsManager* pM;
 };
 

@@ -91,7 +91,6 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 
 			map->addTile(id, tempTile);
 
-			tempTile = 0;
 			delete tempTile;
 			
 		} else if (tokens[0].compare(DataTypeCup) == 0) {

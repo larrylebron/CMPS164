@@ -19,8 +19,6 @@
 #include "externalLibs\Timer.h"
 #include "Logger.h"
 
-//Frame length in seconds -- for 60 fps
-const double FRAME_TIME = .0166666666666666666666;
 
 //timer
 Timer frameTimer;
@@ -207,10 +205,11 @@ void new_frame() {
 	glRotatef(rotateM[2], 0, 0, 1);
 	glScalef(zoom, zoom, zoom);
 
-	//process ui -- any new impulse forces?
+	//process ui -- any new impulse forces? -- right now, this is just hacked to set the ball's
+	//velocity by clicking "play game" in the menu
 
-	//update the ball simulation
-	currLev->getBall()->doSimulation(currTime);
+	//this should be scrolling through the game manager's list of all Simulated objects
+	currLev->getBall()->doSimulation();
 
 	currLev->update();
 
@@ -378,8 +377,6 @@ void handle_menu( int ID ) {
 		break;
 	case 6:
 		currentMode = PLAY_GAME;
-		//hack set the ball's velocity to make it move
-		currLev->getBall()->setVelocity(Vec3f(.2, 0, -.2));
 		break;
 	case 7:
 		// calculate path

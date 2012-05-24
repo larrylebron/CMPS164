@@ -117,13 +117,13 @@ void renderManager::drawWall(Vec3f start, Vec3f end) {
 }
 */
 
-void renderManager::drawPolygon(std::vector<Vec3f> vertices, Vec3f normal, Vec3f color) {
+void renderManager::drawPolygon(vector<Vec3f> vertices, Vec3f normal, Vec3f color) {
 	
 	glBegin(GL_POLYGON);
 
 	glColor3f(color[0], color[1], color[2]);
 	glNormal3f(normal[0], normal[1], normal[2]);
-	for (std::vector<Vec3f>::iterator it = vertices.begin(); it != vertices.end(); it++) {
+	for (vector<Vec3f>::iterator it = vertices.begin(); it != vertices.end(); it++) {
 		Vec3f v = *it;
 		glVertex3f(v[0], v[1], v[2]);
 	}

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ball.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="cup.cpp" />
     <ClCompile Include="externalLibs\mmanager.cpp" />
     <ClCompile Include="externalLibs\Timer.cpp" />
@@ -23,12 +24,14 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="renderManager.cpp" />
+    <ClCompile Include="Simulated.cpp" />
     <ClCompile Include="tee.cpp" />
     <ClCompile Include="tile.cpp" />
     <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ball.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="cup.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="externalLibs\mmanager.h" />

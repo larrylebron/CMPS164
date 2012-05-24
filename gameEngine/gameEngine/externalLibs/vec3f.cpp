@@ -94,6 +94,11 @@ const Vec3f &Vec3f::operator-=(const Vec3f &other) {
 	return *this;
 }
 
+const bool &Vec3f::operator!=(const Vec3f &other) {
+	return (v[0] != other.v[0]) || (v[1] != other.v[1]) || (v[2] != other.v[2]);
+}
+
+
 float Vec3f::magnitude() const {
 	return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 }
@@ -122,7 +127,7 @@ Vec3f operator*(float scale, const Vec3f &v) {
 }
 
 ostream &operator<<(ostream &output, const Vec3f &v) {
-	cout << '(' << v[0] << ", " << v[1] << ", " << v[2] << ')';
+	output << '(' << v[0] << ", " << v[1] << ", " << v[2] << ')';
 	return output;
 }
 

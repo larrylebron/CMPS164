@@ -45,6 +45,7 @@ class Vec3f {
 		const Vec3f &operator/=(float scale);
 		const Vec3f &operator+=(const Vec3f &other);
 		const Vec3f &operator-=(const Vec3f &other);
+		const bool &operator!=(const Vec3f &other);
 		
 		float magnitude() const;
 		float magnitudeSquared() const;

@@ -36,11 +36,15 @@ void level::addTile(int pId, CMMPointer<tile>* pTile)
 {
 	numTiles++;
 	tiles[pId] = *pTile;
+
 }
 
 void level::addBall(int pId, CMMPointer<ball>* pBall) {
 	numBalls++;
 	balls[pId] = *pBall;
+	balls[pId]->setCurrTile(getCurrTile()); //initialize the ball's current tile
+	//set the tile reference map
+	balls[pId]->setTileMap(&tiles);
 }
 
 void level::addTee(int pId, CMMPointer<tee>* pTee) {
@@ -117,20 +121,20 @@ bool level::checkLevel() {
 void level::update() {
 	std::map<int, CMMPointer<tile>>::iterator it;
 	for ( it=tiles.begin(); it != tiles.end(); it++ ) {
-		//print info for the tile pointed at by the CMMPointer
 		(*it).second->draw();
 	}
 	
 	std::map<int, CMMPointer<ball>>::iterator itB;
 	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
 		(*itB).second->draw();
+		//(*itB).second->setCurrTile(getCurrTile());//update the ball's current tile -- only needed at init?
+
 	}
 	
 	std::map<int, CMMPointer<cup>>::iterator itC;
 	for ( itC=cups.begin(); itC != cups.end(); itC++ ) {
 		(*itC).second->draw();
 	}
-
 }
 
 string level::toString() {

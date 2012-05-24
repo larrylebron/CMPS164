@@ -1,14 +1,20 @@
 #include "ball.h"
 
 
+//ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius, CMMPointer<level> pCurrLev)
 ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius)
 	: GameObject(pID), Drawable(pColor)
 {
+	velocity = Vec3f(.6, 0,-.05);
 	position = pPosition;
 	radius = pRadius;
 
-	velocity = Vec3f(0,0,0);
-	lastFrameTime = 0;
+	currTile = 0;
+	lastTileId = 0;
+	tileMap = 0;
+
+	enteredNewTileTime = 0;
+	delayTileReentry = false;
 }
 
 
@@ -21,37 +27,101 @@ Vec3f ball::getPosition() {
 	return posCopy;
 }
 
-void ball::setVelocity(Vec3f pVelocity) {
-	velocity = pVelocity;
+void ball::setTileMap(std::map<int, CMMPointer<tile>>* newTileMap) {
+	tileMap = newTileMap;
 }
 
-Vec3f ball::getVelocity() {
-	Vec3f velCopy = velocity;
-	return velCopy;
-}
 
-void ball::setCurrSurfaceNormal(Vec3f pNormal) {
-	if (currSurfaceNormal[0] != pNormal[0] || 
-		currSurfaceNormal[1] != pNormal[1] || 
-		currSurfaceNormal[2] != pNormal[2] ) {
-		//calcNewDirection();
-		cout << "new normal: " << pNormal;
-	}
-	currSurfaceNormal = pNormal;
+void ball::setCurrTile(CMMPointer<tile> newTile) {
+	currTile = newTile;
+	currTileNormal = currTile->getNormal();
+	currTile->toggleHighlight();
+	lastTileId = currTile->getID();
 }
 
 void ball::draw() {
-	//draw the ball
-	renderManager::Instance()->drawSphere(radius, normal, position, color);
+	//draw the ball -- add radius to position in normal direction so it isn't in the ground
+	renderManager::Instance()->drawSphere(radius, normal, position + normal*radius, color);
 }
 
-void ball::doSimulation(float currTime) {
+void ball::doSimulation() {
+	
 	//update timer
-	float timeElapsed = currTime - lastFrameTime;
+	double currTime = timer.getElapsedTimeInSec();
+	double timeElapsed = currTime - lastFrameTime;
 	lastFrameTime = currTime;
 
-	position = PhysicsManager::Instance()->calcPosition(position, velocity, timeElapsed);
+	//resolve a collision detected last frame
+	if (resolveCollision) {
+		cout << "resolve collision";
+		velocity = postCollisionVelocity;
+		resolveCollision = false;
+	}
+
+	Vec3f endPos = pM->calcPosition(position, velocity, timeElapsed);//end position this frame
+	Vec3f futurePos = pM->calcPosition(endPos, velocity, FRAME_TIME);//end position next frame
+	checkFutureCollision(endPos, futurePos);//check for a collision one frame ahead
 	
+	//set position by current velocity
+	position = endPos;
+}
+
+void ball::checkFutureCollision(Vec3f startPos, Vec3f endPos) {
+
+	vector<CMMPointer<Plane>> planes = currTile->getEdgePlanes();
+
+	for (int i = 0, collision = false; i < planes.size() && !resolveCollision; i++) {
+
+		Vec3f* intPoint = pM->calcSpherePlaneIntersect(radius, startPos, endPos, planes[i]->getNormal(), planes[i]->getVertices() );
+	
+		//collides with plane i
+		if (intPoint) {
+			resolveCollision = true; //resolve this collision next frame
+			vector<int> neighbors = currTile->getNeighbors();
+
+			//wall collision
+			if (neighbors[i] == 0) {
+				postCollisionVelocity = pM->calcPlaneReflectionVelocity(velocity, planes[i]->getNormal());
+				cout << "velocity now: " << velocity << "\npost coll" << postCollisionVelocity << endl;
+			}
+			//new tile entry
+			else {
+				//if trying to reenter last tile, check to see if time is up
+				if (delayTileReentry && lastTileId == neighbors[i]) {
+					if ( (timer.getElapsedTime() - enteredNewTileTime) > TILE_REENTRY_DELAY_TIME) 
+						delayTileReentry = false; //delay time is up
+				} else {
+					resolveNewTileEntry(neighbors[i]); 
+				}//resolve tile else
+			}//new tile else
+		}//collision detected 
+		delete intPoint; //deallocate the memory
+	}//checking for collisions against planes
+}//doSimulation
+
+void ball::resolveNewTileEntry(int newTileId) {
+
+	//set reentry delay params
+	enteredNewTileTime = timer.getElapsedTime();
+	delayTileReentry = true;
+	lastTileId = currTile->getID();
+
+	currTile->toggleHighlight();//turn off tile's highlight
+	currTile = (*tileMap)[newTileId]; //set the new tile as currTile
+	currTile->toggleHighlight(); //turn on new tile's highlight
+
+	Vec3f newNormal = currTile->getNormal();
+
+	//compensate for change in normal by setting new velocity
+	if (currTileNormal != newNormal) {
+		
+		Vec3f perp = velocity.cross(WORLD_UP_VECTOR);
+		Vec3f newDirection = (perp.cross(newNormal)).normalize();
+		postCollisionVelocity = -newDirection;
+	} else {
+		postCollisionVelocity = velocity;
+	}
+	currTileNormal = newNormal;
 }
 
 string ball::toString() {

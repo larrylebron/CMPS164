@@ -54,10 +54,6 @@ private:
 	Logger(){};
 	//write message to filename and console. Will write to cerr if error is true
 	bool pWrite(string filename, string message, bool error);
-   /*
-   Logger(Logger const&){};             // copy constructor is private
-   Logger& operator=(Logger const&){};  // assignment operator is private
-   */
    static Logger* m_pInstance;
    std::set<string> fileNames;				//The set of files that have been written to
    std::ofstream writer;

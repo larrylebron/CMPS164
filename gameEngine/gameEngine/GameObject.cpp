@@ -10,3 +10,7 @@ GameObject::GameObject(int pID, Vec3f pNormal){
 int GameObject::getID() {
 	return id;
 }
+
+Vec3f GameObject::getNormal() {
+	return normal;
+}
