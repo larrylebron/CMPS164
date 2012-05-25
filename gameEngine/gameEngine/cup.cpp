@@ -4,7 +4,6 @@
 cup::cup(int pID, Vec3f pPosition, Vec3f pColor, float pRadius)
 	: GameObject(pID), Drawable(pColor)
 {
-
 	position = pPosition;
 	radius = pRadius;
 }
@@ -23,6 +22,10 @@ void cup::draw() {
 Vec3f cup::getPosition() {
 	Vec3f posCopy = position;
 	return posCopy;
+}
+
+float cup::getRadius() {
+	return radius;
 }
 
 string cup::toString() {

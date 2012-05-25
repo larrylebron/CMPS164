@@ -5,7 +5,6 @@
 ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius)
 	: GameObject(pID), Drawable(pColor)
 {
-	velocity = Vec3f(.6, 0,-.05);
 	position = pPosition;
 	radius = pRadius;
 
@@ -15,11 +14,16 @@ ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius)
 
 	enteredNewTileTime = 0;
 	delayTileReentry = false;
+	inCup = false;
 }
 
 
 ball::~ball(void)
 {
+}
+
+bool ball::isInCup() {
+	return inCup;
 }
 
 Vec3f ball::getPosition() {
@@ -31,6 +35,9 @@ void ball::setTileMap(std::map<int, CMMPointer<tile>>* newTileMap) {
 	tileMap = newTileMap;
 }
 
+void ball::setCupPos(Vec3f pCupPos) {
+	cupPos = pCupPos;
+}
 
 void ball::setCurrTile(CMMPointer<tile> newTile) {
 	currTile = newTile;
@@ -41,22 +48,43 @@ void ball::setCurrTile(CMMPointer<tile> newTile) {
 
 void ball::draw() {
 	//draw the ball -- add radius to position in normal direction so it isn't in the ground
-	renderManager::Instance()->drawSphere(radius, normal, position + normal*radius, color);
+	if (!inCup)renderManager::Instance()->drawSphere(radius, normal, position + normal*radius, color);
 }
 
 void ball::doSimulation() {
-	
+
 	//update timer
 	double currTime = timer.getElapsedTimeInSec();
 	double timeElapsed = currTime - lastFrameTime;
 	lastFrameTime = currTime;
+	
+	//update velocity with any new forces
+	while ( !newForces.empty() ) {
+		velocity += newForces.front();
+		newForces.pop();
+	}
 
+	//check to see if the ball's velocity is greater than the friction
+	if (velocity.magnitude() >= currTile->getFrictionMagnitude() ) {
+		active = true;
+	} 
+	//if velocity magnitude is under the friction threshold, don't do anything
+	//reset the ball's parameters and make it inactive
+	else {
+		velocity = Vec3f(0,0,0);
+		active = false;
+		resolveCollision = false;
+		return;
+	}
+	
 	//resolve a collision detected last frame
 	if (resolveCollision) {
-		cout << "resolve collision";
 		velocity = postCollisionVelocity;
 		resolveCollision = false;
 	}
+
+	//apply friction to the future velocity
+	velocity += calcFriction();
 
 	Vec3f endPos = pM->calcPosition(position, velocity, timeElapsed);//end position this frame
 	Vec3f futurePos = pM->calcPosition(endPos, velocity, FRAME_TIME);//end position next frame
@@ -64,13 +92,21 @@ void ball::doSimulation() {
 	
 	//set position by current velocity
 	position = endPos;
+
+	//If this tile has a cup, check for collison with the cup
+	if (currTile->hasCup()) checkCupCollision();
+}
+
+void ball::checkCupCollision() {
+	Vec3f cupRay = cupPos - position;
+	if (cupRay.magnitude() <= CUP_RADIUS) inCup = true;
 }
 
 void ball::checkFutureCollision(Vec3f startPos, Vec3f endPos) {
 
 	vector<CMMPointer<Plane>> planes = currTile->getEdgePlanes();
 
-	for (int i = 0, collision = false; i < planes.size() && !resolveCollision; i++) {
+	for (unsigned int i = 0, collision = false; i < planes.size() && !resolveCollision; i++) {
 
 		Vec3f* intPoint = pM->calcSpherePlaneIntersect(radius, startPos, endPos, planes[i]->getNormal(), planes[i]->getVertices() );
 	
@@ -82,8 +118,7 @@ void ball::checkFutureCollision(Vec3f startPos, Vec3f endPos) {
 			//wall collision
 			if (neighbors[i] == 0) {
 				postCollisionVelocity = pM->calcPlaneReflectionVelocity(velocity, planes[i]->getNormal());
-				cout << "velocity now: " << velocity << "\npost coll" << postCollisionVelocity << endl;
-			}
+				}
 			//new tile entry
 			else {
 				//if trying to reenter last tile, check to see if time is up
@@ -122,6 +157,12 @@ void ball::resolveNewTileEntry(int newTileId) {
 		postCollisionVelocity = velocity;
 	}
 	currTileNormal = newNormal;
+}
+
+Vec3f ball::calcFriction() {
+	if (velocity.magnitude() == 0) return Vec3f(0,0,0);//if ball is stationary
+	return velocity.normalize() * -1 * currTile->getFrictionMagnitude();
+
 }
 
 string ball::toString() {

@@ -27,18 +27,29 @@ public:
 	void addCup(int pId, CMMPointer<cup>* pCup);
 
 	CMMPointer<ball> getBall();
+
 	//get the positions -- currently assumes only a single ball & cup
 	Vec3f getBallPos();
 	Vec3f getCupPos();
 	
 	//Check the level to confirm it's valid
 	bool checkLevel();
-	CMMPointer<tile> getCurrTile();
-	void update(); //update the level and draw
 
-	string toString(); //print info about the tiles in the level
+	//returns a pointer to the tile containing this point, or a void pointer
+	CMMPointer<tile> getTileContainingPoint(Vec3f point);
+
+	//returns true if the level is complete
+	bool isComplete(); 
+
+	//update the level and draw
+	void update(); 
+
+	//print info about the tiles in the level
+	string toString(); 
+
 	AUTO_SIZE;
 private:
+	void setComponentParams();//update the ball with tile info & any tiles containing cups with that info
 	//The tiles comprising the level, indexed by their ids
 	std::map<int, CMMPointer<tile>> tiles;
 	std::map<int, CMMPointer<tee>> tees; //the tee
@@ -48,7 +59,7 @@ private:
 	int numBalls;
 	int numTees;
 	int numCups;
-
+	bool complete; //true when the level is complete
 };
 
 #endif

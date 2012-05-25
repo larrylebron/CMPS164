@@ -1,20 +1,89 @@
-﻿Build started 5/23/2012 11:52:02 PM.
-     1>Project "C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngineNew\gameEngine\gameEngine\gameEngine.vcxproj" on node 2 (build target(s)).
-     1>InitializeBuildStatus:
+﻿Build started 5/25/2012 5:32:53 AM.
+     1>Project "C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngine\gameEngine\gameEngine\gameEngine.vcxproj" on node 2 (build target(s)).
+     1>PrepareForBuild:
+         Creating directory "C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngine\gameEngine\Debug\".
+       InitializeBuildStatus:
          Creating "Debug\gameEngine.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         All outputs are up-to-date.
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ball.cpp Plane.cpp cup.cpp externalLibs\mmanager.cpp externalLibs\Timer.cpp externalLibs\vec3f.cpp fileReader.cpp GameObject.cpp level.cpp Logger.cpp main.cpp PhysicsManager.cpp renderManager.cpp Simulated.cpp tee.cpp tile.cpp Wall.cpp
+         Wall.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         tile.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         tee.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         Simulated.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         renderManager.cpp
+         PhysicsManager.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         main.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\main.cpp(321): warning C4102: 'SHOW_PATH' : unreferenced label
+         Logger.cpp
+         level.cpp
+         GameObject.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         fileReader.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\filereader.cpp(24): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(110) : see declaration of 'strcat'
+         vec3f.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\externallibs\vec3f.cpp(105): warning C4172: returning address of local variable or temporary
+         Timer.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\externallibs\timer.cpp(144): warning C4996: 'localtime': This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\time.inl(112) : see declaration of 'localtime'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\externallibs\timer.cpp(145): warning C4996: 'asctime': This function or variable may be unsafe. Consider using asctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\time.h(153) : see declaration of 'asctime'
+         mmanager.cpp
+         cup.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         Plane.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         ball.cpp
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(27): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+     1>c:\users\larry\dropbox\documents\school&coding\cs164_gameengines\gameengine\gameengine\gameengine\util.h(35): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+         Generating Code...
        ManifestResourceCompile:
-         All outputs are up-to-date.
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\gameEngine.exe.embed.manifest.res" Debug\gameEngine_manifest.rc 
        Link:
-         All outputs are up-to-date.
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngine\gameEngine\Debug\gameEngine.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\gameEngine.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngine\gameEngine\Debug\gameEngine.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngine\gameEngine\Debug\gameEngine.lib" /MACHINE:X86 Debug\gameEngine.exe.embed.manifest.res
+         Debug\ball.obj
+         Debug\Plane.obj
+         Debug\cup.obj
+         Debug\mmanager.obj
+         Debug\Timer.obj
+         Debug\vec3f.obj
+         Debug\fileReader.obj
+         Debug\GameObject.obj
+         Debug\level.obj
+         Debug\Logger.obj
+         Debug\main.obj
+         Debug\PhysicsManager.obj
+         Debug\renderManager.obj
+         Debug\Simulated.obj
+         Debug\tee.obj
+         Debug\tile.obj
+         Debug\Wall.obj
        Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\gameEngine.exe.embed.manifest" /manifest Debug\gameEngine.exe.intermediate.manifest
          All outputs are up-to-date.
+       LinkEmbedManifest:
+         All outputs are up-to-date.
+         gameEngine.vcxproj -> C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngine\gameEngine\Debug\gameEngine.exe
        FinalizeBuildStatus:
          Deleting file "Debug\gameEngine.unsuccessfulbuild".
          Touching "Debug\gameEngine.lastbuildstate".
-     1>Done Building Project "C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngineNew\gameEngine\gameEngine\gameEngine.vcxproj" (build target(s)).
+     1>Done Building Project "C:\Users\larry\Dropbox\documents\school&coding\cs164_gameEngines\gameEngine\gameEngine\gameEngine\gameEngine.vcxproj" (build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.19
+Time Elapsed 00:00:15.81

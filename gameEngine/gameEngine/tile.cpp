@@ -3,7 +3,7 @@
 tile::~tile(){
 }
 
-tile::tile(int pID, vector<Vec3f> pVertices, vector<int> pNeighbors, Vec3f pColor)
+tile::tile(int pID, vector<Vec3f> pVertices, vector<int> pNeighbors, Vec3f pColor, float pFrictionMagnitude)
 	: Plane(pVertices, pID), Drawable (pColor)
 {
 
@@ -13,16 +13,23 @@ tile::tile(int pID, vector<Vec3f> pVertices, vector<int> pNeighbors, Vec3f pColo
 	buildEdgePlanes();
 
 	highlighted = false;
+	frictionMagnitude = pFrictionMagnitude;
 }
 
 void tile::toggleHighlight() {
 	highlighted = !highlighted;
 }
 
+bool tile::hasCup() {
+	return containsCup;
+}
 
+void tile::setContainsCup(bool hasCup) {
+	containsCup = hasCup;
+}
 
 void tile::buildEdgePlanes() {
-	for (int i = 0; i < neighbors.size(); i++) {
+	for (unsigned int i = 0; i < neighbors.size(); i++) {
 			//the edge boundary plane
 			vector<Vec3f> planeVertices;
 
@@ -52,7 +59,7 @@ void tile::draw() {
 	if (highlighted) renderManager::Instance()->drawPolygon(vertices, normal, HIGHLIGHT_COLOR);
 	else renderManager::Instance()->drawPolygon(vertices, normal, color);
 
-	for (int i = 0; i < edgePlanes.size(); i++) {
+	for (unsigned int i = 0; i < edgePlanes.size(); i++) {
 		//only call draw on the walled edges
 		if (neighbors[i] == 0) {
 			Plane* bP = edgePlanes[i];

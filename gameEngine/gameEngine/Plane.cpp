@@ -24,7 +24,7 @@ Plane::~Plane()
 
 void Plane::initBounds() {
 	minBounds = maxBounds = vertices[0];
-	for (int i = 0; i < vertices.size(); i++) {
+	for (unsigned int i = 0; i < vertices.size(); i++) {
 		Vec3f v = vertices[i];
 
 		if (v[0] < minBounds[0]) minBounds[0] = v[0]; //new min x
@@ -51,7 +51,7 @@ bool Plane::containsPoint(Vec3f p) {
 	//Check p against finite plane's dimensions
 	//The following code is adapted from Randolph Franklin's http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#3D%20Polygons
 
-  int i, j = 0;
+  unsigned int i, j = 0;
   bool in = false;
   for (i = 0, j = vertices.size()-1; i < vertices.size(); j = i++) {
     if ( ((vertices[i][2]>p[2]) != (vertices[j][2]>p[2])) &&
@@ -75,7 +75,7 @@ string Plane::toString() {
 	ss << "Plane " << id << ": \n";
 	ss << "normal: " << normal;
 	ss << endl;
-	for (int i = 0; i < vertices.size(); i++) {
+	for (unsigned int i = 0; i < vertices.size(); i++) {
 		ss << vertices[i] << endl;
 	}	
 	return ss.str();

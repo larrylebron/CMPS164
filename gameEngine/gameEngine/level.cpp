@@ -7,29 +7,31 @@ level::level()
 	numBalls = 0;
 	numTees = 0;
 	numCups = 0;
+	complete = false;
 }
 
 level::~level()
 {
+	/*
 	std::map<int, CMMPointer<tile>>::iterator itT;
 	for ( itT=tiles.begin() ; itT != tiles.end(); itT++ ) {
-		delete (*itT).second;
+		(*itT).second = 0;
 	}
 	
 	std::map<int, CMMPointer<ball>>::iterator itB;
 	for ( itB=balls.begin() ; itB!= balls.end(); itB++ ) {
-		delete (*itB).second;
+		(*itB).second = 0;
 	}
 
 	std::map<int, CMMPointer<tee>>::iterator itTee;
 	for ( itTee=tees.begin() ; itTee != tees.end(); itTee++ ) {
-		delete (*itTee).second;
+		(*itTee).second = 0;
 	}
 
 	std::map<int, CMMPointer<cup>>::iterator itC;
 	for ( itC=cups.begin() ; itC != cups.end(); itC++ ) {
-		delete (*itC).second;
-	}
+		(*itC).second = 0;
+	}*/
 }
 
 void level::addTile(int pId, CMMPointer<tile>* pTile) 
@@ -42,9 +44,6 @@ void level::addTile(int pId, CMMPointer<tile>* pTile)
 void level::addBall(int pId, CMMPointer<ball>* pBall) {
 	numBalls++;
 	balls[pId] = *pBall;
-	balls[pId]->setCurrTile(getCurrTile()); //initialize the ball's current tile
-	//set the tile reference map
-	balls[pId]->setTileMap(&tiles);
 }
 
 void level::addTee(int pId, CMMPointer<tee>* pTee) {
@@ -69,20 +68,19 @@ Vec3f level::getCupPos() {
 	return (*cups.begin()).second->getPosition();
 }
 
+bool level::isComplete() {
+	return complete;
+}
 
-CMMPointer<tile> level::getCurrTile() {
-	//get the ball's position -- assumes only one ball
-	Vec3f ballPos = getBallPos();
+CMMPointer<tile> level::getTileContainingPoint(Vec3f point) {
 
 	//check through the tiles to see if they contain the ball's position
 	std::map<int, CMMPointer<tile>>::iterator it;
 	for ( it=tiles.begin() ; it != tiles.end(); it++ ) {
 		CMMPointer<tile> checkTile = (*it).second;
-		if ( checkTile->containsPoint(ballPos) ) return checkTile; //return pointer to current tile
+		if ( checkTile->containsPoint(point) ) return checkTile; //return pointer to current tile
 	}
-
-	Logger::Instance()->err("Ball not on any tile");
-	return CMMPointer<tile>(); //return a void pointer
+	return CMMPointer<tile>();
 }
 
 bool level::checkLevel() {
@@ -115,10 +113,42 @@ bool level::checkLevel() {
 		Logger::Instance()->err("No tees in the level");
 		return false;
 	}
+
+	//Level is valid, so it's safe to update the ball & cup tile with relevant info
+	setComponentParams();
 	return true;
 }
 
+void level::setComponentParams() {
+	//assumes one ball
+	CMMPointer<ball> ball = (*balls.begin()).second;
+
+	//initialize the ball's current tile
+	Vec3f ballPos = ball->getPosition();
+	CMMPointer<tile> ballTile = getTileContainingPoint(ballPos);
+	if (!ballTile) Logger::Instance()->err("ball not on any tile");
+	ball->setCurrTile(ballTile); 
+
+	//set the tile reference map
+	ball->setTileMap(&tiles);
+
+	//flag the tile containing the cup -- assumes only one cup
+	Vec3f cupPos = getCupPos();
+	CMMPointer<tile> cupTile = getTileContainingPoint(cupPos);
+	if (!cupTile) Logger::Instance()->err("cup not on any tile");
+	cupTile->setContainsCup(true);
+
+	//set the ball's cup position for collision checking
+	ball->setCupPos(cupPos);
+}
+
 void level::update() {
+
+	//check to see if the ball's in the cup -- if so, mark the level complete
+	if ( (*balls.begin()).second->isInCup() ) {
+		complete = true;
+	}
+
 	std::map<int, CMMPointer<tile>>::iterator it;
 	for ( it=tiles.begin(); it != tiles.end(); it++ ) {
 		(*it).second->draw();

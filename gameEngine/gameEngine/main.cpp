@@ -167,7 +167,7 @@ void updateCamera(int w = viewportWidth, int h = viewportHeight) {
 	if (currentMode == CAMERA_ROTATE) {
 		updateCameraDirection();
 	}
-
+	
 	Vec3f ballPos = currLev->getBallPos();
 	Vec3f destination = cameraPan + rotatedCameraDirection;
 	if (currentMode == PLAY_GAME) {
@@ -205,17 +205,34 @@ void new_frame() {
 	glRotatef(rotateM[2], 0, 0, 1);
 	glScalef(zoom, zoom, zoom);
 
-	//process ui -- any new impulse forces? -- right now, this is just hacked to set the ball's
-	//velocity by clicking "play game" in the menu
+		//check to see if level is complete -- if it is, delete it & load the next or exit
+		//main should have a queue of all the levels
+		if (currLev.isValid() && currLev->isComplete()) {
+			cout << "delete level -- move on to next!" << endl;
+			
+			//load next level or exit game here
+		}
 
-	//this should be scrolling through the game manager's list of all Simulated objects
-	currLev->getBall()->doSimulation();
+	//if the current level exists
+	if (currLev.isValid()) {
 
-	currLev->update();
+		CMMPointer<ball> ball = currLev->getBall();
+
+		//ball is inactive, so show the UI
+		if ( !ball->isActive() ) {
+			//run UI here
+			//allow UI to call ball's apply force with an impulse
+			//example:
+			//ball->applyForce(Vec3f(PI,1));
+		}
+
+		//this should be scrolling through the game manager's list of all Simulated objects
+		currLev->getBall()->doSimulation();
+		currLev->update();
+	}
 
 	glPopMatrix();
-	
-	
+		
 	glFlush();
 	glutSwapBuffers();
 	IMMObject::CollectGarbage();
@@ -248,7 +265,8 @@ void cb_mouse( int button, int state, int x, int y )
 {
 
 	// Store button state if mouse down
-	if (state == GLUT_DOWN) {		
+	if (state == GLUT_DOWN) {	
+		currLev->getBall()->applyForce(Vec3f(PI,5));
 		btn[button] = 1;
 	} else {
 		btn[button] = 0;

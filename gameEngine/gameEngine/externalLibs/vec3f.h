@@ -31,6 +31,7 @@ class Vec3f {
 	public:
 		Vec3f();
 		Vec3f(float x, float y, float z);
+		Vec3f(float radianAngle, float magnitude); //construct a vector with an angle & magnitude
 		
 		float &operator[](int index);
 		float operator[](int index) const;

@@ -58,6 +58,10 @@ void IMMObject::CollectRemainingObjects(bool bEmitWarnings)
 	liveObjects.clear();
 }
 
+unsigned int IMMObject::getLiveObjectsSize() {
+	return liveObjects.size();
+}
+
 string IMMObject::toString() {
 	string info = "IMMobject";
 	return info;

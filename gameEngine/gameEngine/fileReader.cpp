@@ -99,7 +99,7 @@ bool fileReader::readFile(char* filename, CMMPointer<level> map) {
 			Vec3f position(atof(tokens[2].c_str()),
 					atof(tokens[3].c_str()),
 					atof(tokens[4].c_str()));
-			CMMPointer<cup>* tempCup = new CMMPointer<cup>(new cup(id, position, CUP_COLOR, CUP_RADIUS));
+			CMMPointer<cup>* tempCup = new CMMPointer<cup>(new cup(id, position));
 			map->addCup(id, tempCup);
 			tempCup = 0;
 			delete tempCup;

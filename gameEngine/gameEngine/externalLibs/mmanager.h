@@ -27,6 +27,8 @@ class IMMObject
 		static void CollectGarbage();
 		static void CollectRemainingObjects(bool bEmitWarnings=false);
 		virtual unsigned long size()=0;
+		long getRefCount() {return refCount;}
+		unsigned int getLiveObjectsSize();//return the size of liveObjects
 		virtual string toString(); // return an info string about the object
 };
 

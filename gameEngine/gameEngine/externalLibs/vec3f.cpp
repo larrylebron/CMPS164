@@ -38,6 +38,13 @@ Vec3f::Vec3f(float x, float y, float z) {
 	v[2] = z;
 }
 
+Vec3f::Vec3f(float radianAngle, float magnitude) {
+
+	v[0] = sin(radianAngle) * magnitude;
+	v[1] = 0;
+	v[2] = cos(radianAngle) * magnitude;
+}
+
 float &Vec3f::operator[](int index) {
 	return v[index];
 }
