@@ -9,6 +9,7 @@
 #include "util.h"
 #include "Logger.h"
 #include "level.h"
+#include "Course.h"
 
 using std::ifstream;
 
@@ -23,6 +24,7 @@ public:
 	fileReader();
 	~fileReader();
 	//reads in the level file. Returns false if an error occurs
+	bool readCourseFile(char* filename, CMMPointer<Course> course);
 	bool readFile(char* filename, CMMPointer<level> map);
 	vector<string> strSplit(string data, string delims = " ");
 };

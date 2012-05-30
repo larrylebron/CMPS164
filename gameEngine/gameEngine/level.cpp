@@ -8,6 +8,8 @@ level::level()
 	numTees = 0;
 	numCups = 0;
 	complete = false;
+	par = 1;
+	strokes = 1;
 }
 
 level::~level()
@@ -62,6 +64,11 @@ CMMPointer<ball> level::getBall() {
 
 Vec3f level::getBallPos() {
 	return (*balls.begin()).second->getPosition();
+}
+
+void level::resetBallPos() {
+	Vec3f teePos = (*tees.begin()).second->getPosition();
+	(*balls.begin()).second->setPosition(teePos);
 }
 
 Vec3f level::getCupPos() {
@@ -165,6 +172,48 @@ void level::update() {
 	for ( itC=cups.begin(); itC != cups.end(); itC++ ) {
 		(*itC).second->draw();
 	}
+}
+
+
+// reset ball positions to tee position
+void level::resetLevel()
+{
+	cout << "reseting" << endl;
+	resetBallPos();
+	complete = false;
+}
+
+void level::setLevelName(string name)
+{
+	levelName = name;
+}
+
+string level::getLevelName()
+{
+	return levelName;
+}
+
+void level::setPar(int toPar)
+{
+	par = toPar;
+}
+
+int level::getPar()
+{
+	return par;
+}
+
+int level::getStrokes() {
+	return strokes;
+}
+
+void level::addStroke(int num) {
+	strokes += num;
+}
+
+int level::getScore()
+{
+	return par - strokes;
 }
 
 string level::toString() {

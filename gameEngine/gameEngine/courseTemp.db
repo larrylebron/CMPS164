@@ -1,0 +1,28 @@
+course "NCSU-Express" 3
+begin_hole
+name "Easy as Pi"
+tile 1 4 -.5 0 2 .5 0 2 .5 0 -2 -.5 0 -2 0 0 0 0
+tee 1 0 0 1.75
+cup 1 0 0 -1.75
+par 2
+end_hole
+begin_hole
+name "Over the Hill to Grandma's House"
+tile 1 4 -1 0 2.5 1 0 2.5 1 0 1.5 -1 0 1.5 0 0 2 0
+tile 2 4 -1 0 1.5 1 0 1.5 1 0.5 0.5 -1 0.5 0.5 1 0 3 0
+tile 3 4 -1 0.5 0.5 1 0.5 0.5 1 0.5 -0.5 -1 0.5 -0.5 2 0 4 0
+tile 4 4 -1 0.5 -0.5 1 0.5 -0.5 1 0 -1.5 -1 0 -1.5 3 0 5 0
+tile 5 4 -1 0 -1.5 1 0 -1.5 1 0 -2.5 -1 0 -2.5 4 0 0 0
+cup 5 0 0 -2.25
+tee 1 -0.75 0 2.25
+par 2
+end_hole
+begin_hole
+name "Round the Horn"
+tile 1 4 -.5 0 2 .5 0 2 .5 0 1 -.5 0 1 0 0 2 0
+tile 2 6 -.5 0 1 .5 0 1 1 0 0 .5 0 -1 -.5 0 -1 -1 0 0 1 0 0 3 0 0
+tile 3 4 -.5 0 -1 .5 0 -1 .5 0 -2 -.5 0 -2 2 0 0 0
+tee 1 0 0 1.75
+cup 3 0.0 0 -1.75
+par 2
+end_hole

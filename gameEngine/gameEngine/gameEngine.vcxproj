@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ball.cpp" />
+    <ClCompile Include="Course.cpp" />
+    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="cup.cpp" />
     <ClCompile Include="externalLibs\mmanager.cpp" />
@@ -31,6 +33,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ball.h" />
+    <ClInclude Include="Course.h" />
+    <ClInclude Include="HUD.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="cup.h" />
     <ClInclude Include="Drawable.h" />
@@ -48,6 +52,10 @@
     <ClInclude Include="tile.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="Wall.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="course.db" />
+    <None Include="courseTemp.db" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A526AF0C-9EE5-41B5-BBED-E849FF0AF15A}</ProjectGuid>

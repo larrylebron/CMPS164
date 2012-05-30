@@ -26,6 +26,11 @@ bool ball::isInCup() {
 	return inCup;
 }
 
+
+void ball::setPosition(Vec3f pos) {
+	position = pos;
+}
+
 Vec3f ball::getPosition() {
 	Vec3f posCopy = position;
 	return posCopy;
@@ -65,7 +70,7 @@ void ball::doSimulation() {
 	}
 
 	//check to see if the ball's velocity is greater than the friction
-	if (velocity.magnitude() >= currTile->getFrictionMagnitude() ) {
+	if (velocity.magnitude() >= DEFAULT_FRICTION_MAGNITUDE){ //currTile->getFrictionMagnitude() ) {
 		active = true;
 	} 
 	//if velocity magnitude is under the friction threshold, don't do anything

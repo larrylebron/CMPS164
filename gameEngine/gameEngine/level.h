@@ -30,6 +30,7 @@ public:
 
 	//get the positions -- currently assumes only a single ball & cup
 	Vec3f getBallPos();
+	void resetBallPos();
 	Vec3f getCupPos();
 	
 	//Check the level to confirm it's valid
@@ -44,6 +45,17 @@ public:
 	//update the level and draw
 	void update(); 
 
+	// reset ball positions to tee position
+	void resetLevel();
+
+	void setLevelName(string name);
+	string getLevelName();
+
+	void setPar(int toPar);
+	int getPar();
+	int getStrokes();
+	void addStroke(int num = 1);
+	int getScore();
 	//print info about the tiles in the level
 	string toString(); 
 
@@ -59,7 +71,10 @@ private:
 	int numBalls;
 	int numTees;
 	int numCups;
+	int par;
+	int strokes;
 	bool complete; //true when the level is complete
+	string levelName;
 };
 
 #endif

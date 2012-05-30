@@ -10,7 +10,9 @@
 #include <gl\glut.h>
 
 #include "level.h"
+#include "Course.h"
 #include "util.h"
+#include "HUD.h"
 
 
 #include "PhysicsManager.h"
@@ -28,6 +30,8 @@ double currTime;
 
 //The current level
 CMMPointer<level> currLev;
+CMMPointer<Course> course;
+CMMPointer<HUD> hud = new HUD();
 
 //the file reader
 fileReader* fR;
@@ -77,11 +81,16 @@ int		btn[2] = {0};			// Current button state
 int		mouse_x, mouse_y;			// Current mouse position
 
 // Transformation and Shading Mode Variables
-mode	currentMode = CAMERA_PAN;	// Current transformation mode
+mode	currentMode = PLAY_GAME;	// Current transformation mode
 string	instructions[NUM_MODES] =
-{"CAMERA PAN MODE: Hold down left mouse button and drag to pan camera along X and Y Axis. Press \"W\" and \"S\" to pan camera along Z Axis.",
-"CAMERA ZOOM MODE: Press \"W\" and \"S\" to zoom camera in and out. ",
-"CAMERA ROTATE X MODE: Hold down left mouse button and drag up and down to rotate camera along X and Y Axes. Press \"W\" and \"S\" to rotate camera along Z Axis."};
+{"FREELOOK MODEL TRANSLATE MODE: Hold down left mouse button and drag to translate model along X and Y Axis. Press \"W\" and \"S\" to translate model along Z Axis.",
+"FREELOOK MODEL ZOOM MODE: Press \"W\" and \"S\" to zoom model in and out - model zooms equally along all axes.",
+"FREELOOK MODEL ROTATE MODE: Hold down left mouse button and drag to rotate model around X or Y Axis.",
+"FREELOOK CAMERA PAN MODE: Hold down left mouse button and drag to pan camera along X and Y Axis. Press \"W\" and \"S\" to pan camera along Z Axis.",
+"FREELOOK CAMERA ZOOM MODE: Press \"W\" and \"S\" to zoom camera in and out. ",
+"FREELOOK CAMERA ROTATE X MODE: Hold down left mouse button and drag up and down to rotate camera along X and Y Axes. Press \"W\" and \"S\" to rotate camera along Z Axis.",
+"PLAYGAME MODE: \"I\" and \"K\" to increase or decrease power, \"J\" and \"L\" to add anti-clockwise or clockwise angle, \"X\" to shoot.",
+"SHOW PATH MODE: Click to stop showing path"};
 bool	useKeypressForRotate = !false;
 bool	inverseAxis = !false;
 
@@ -99,7 +108,7 @@ float cameraFOV = 45.0f;
 float cameraZNear = 1.0f;
 float cameraZFar = 200.f;
 float cameraRotationDullFactor = 2.0f;
-float cameraTimeStep = 0.00001f;
+float cameraTimeStep = 0.000001f;
 float cameraCurrent = 0.0f;
 Vec3f cameraPath;
 
@@ -108,7 +117,11 @@ GLfloat lightColor[]	= {1.0f, 1.0f, 1.0f, 1.0f};
 GLfloat lightPos[]		= {1.0f, 1.0f, 1.0f, 1.0f}; 
 
 // Viewport Variables
-int viewportX = 0, viewportY = 0, viewportWidth = 1024, viewportHeight = 768;
+int viewportX = 0, viewportY = 0;
+
+float angle = PI, power = 0.5;
+
+bool addStroke = false;
 
 ///////////////////////
 // Utility Functions //
@@ -133,15 +146,6 @@ float bringWithinRange (float f, float range = 360.0f)
 // Camera Related Functions //
 //////////////////////////////
 
-void resetTransformations() {
-	cameraZoom = 1.0f;
-	cameraInitialZ = 10.f;
-	cameraPan = Vec3f(0.0f, 1.0f, cameraInitialZ);
-	rotatedCameraDirection = cameraDirection = Vec3f(0.0f, 0.0f, -cameraInitialZ);
-	rotatedCameraUp = cameraUp = Vec3f(0.0f, 1.0f, 0.0f);
-
-	cameraRotate[0] = cameraRotate[1] = cameraRotate[2] = 0.0f;
-}
 
 void updateCameraDirection() {
 	// keep all angles within range to prevent overflow
@@ -156,27 +160,24 @@ void updateCameraDirection() {
 	rotatedCameraDirection = Vec3f(rotatedCameraDirection[0], rotatedCameraDirection[1] * cos(xAngle) - rotatedCameraDirection[2] * sin(xAngle), rotatedCameraDirection[2] * cos(xAngle) + rotatedCameraDirection[1] * sin(xAngle)); // rotate about x
 	rotatedCameraDirection = Vec3f(rotatedCameraDirection[0] * cos(zAngle) - rotatedCameraDirection[1] * sin(zAngle), rotatedCameraDirection[1] * cos(zAngle) + rotatedCameraDirection[0] * sin(zAngle), rotatedCameraDirection[2]); // rotate about z
 	rotatedCameraUp = Vec3f(cameraUp[0] * cos(zAngle) - cameraUp[1] * sin(zAngle), cameraUp[1] * cos(zAngle) + cameraUp[0] * sin(zAngle), cameraUp[2]); // cameraUp
+
+	glutPostRedisplay();
 }
 
 void updateCamera(int w = viewportWidth, int h = viewportHeight) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(cameraFOV * cameraZoom, (double)w / (double)h, cameraZNear, cameraZFar);
-
-	// only in camera rotate mode, the rotatedCameraDirection would have changed
-	if (currentMode == CAMERA_ROTATE) {
-		updateCameraDirection();
-	}
 	
 	Vec3f ballPos = currLev->getBallPos();
 	Vec3f destination = cameraPan + rotatedCameraDirection;
 	if (currentMode == PLAY_GAME) {
-		gluLookAt(ballPos[0], ballPos[1] + 5.0f, ballPos[2], ballPos[0], ballPos[1], ballPos[2], 0.0f, 0.0f, -1.0f);
+		gluLookAt(ballPos[0], ballPos[1] + 15.0f, ballPos[2], ballPos[0], ballPos[1], ballPos[2], 0.0f, 0.0f, -1.0f);
 	}
 	else if (currentMode == SHOW_PATH) {
 		Vec3f camPos = ballPos + (cameraPath * cameraCurrent);
-		gluLookAt(camPos[0], camPos[1] + 5.0f, camPos[2], camPos[0], camPos[1], camPos[2], 0.0f, 0.0f, -1.0f);
-		
+		gluLookAt(camPos[0], camPos[1] + 15.0f, camPos[2], camPos[0], camPos[1], camPos[2], 0.0f, 0.0f, -1.0f);
+
 		if (cameraCurrent <= 1.0f){
 			cameraCurrent += cameraTimeStep;
 		} else {
@@ -184,34 +185,77 @@ void updateCamera(int w = viewportWidth, int h = viewportHeight) {
 		}
 	} else {
 		gluLookAt(cameraPan[0], cameraPan[1], cameraPan[2], destination[0], destination[1], destination[2], rotatedCameraUp[0], rotatedCameraUp[1], rotatedCameraUp[2]);
+		updateCameraDirection();
 	}
+
+}
+
+
+void resetShooting() {
+	if (!KEEP_LAST_SHOOTING_SETTINGS) {
+		angle = PI;
+		power = 0.5;
+	}
+}
+
+void resetTransformations() {
+	cameraZoom = 1.0f;
+	cameraInitialZ = 10.f;
+	cameraPan = Vec3f(0.0f, 1.0f, cameraInitialZ);
+	rotatedCameraDirection = cameraDirection = Vec3f(0.0f, 0.0f, -cameraInitialZ);
+	rotatedCameraUp = cameraUp = Vec3f(0.0f, 1.0f, 0.0f);
+
+	cameraRotate[0] = cameraRotate[1] = cameraRotate[2] = 0.0f;
 	
-	glutPostRedisplay();
+	updateCameraDirection();
+}
+
+void switchToOrtho() {
+    glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+		glOrtho( 0, viewportWidth , viewportHeight , 0, -1, 1);
+		glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+void switchBackToFrustum() {
+		glEnable(GL_LIGHTING);
+		glEnable(GL_DEPTH_TEST);
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 }
 
 /**
- Manages animation frame
- */
-void new_frame() {
+Manages animation frame
+*/
 
+bool lastStateActive = false;
+
+void new_frame() {
+	hud->updateInfo(course, angle, power);
+	
 	glMatrixMode(GL_MODELVIEW);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-		
-	glPushMatrix();
-	glTranslatef(translate[0], translate[1], translate[2]);
-	glRotatef(rotateM[0], 1, 0, 0);
-	glRotatef(rotateM[1], 0, 1, 0);
-	glRotatef(rotateM[2], 0, 0, 1);
-	glScalef(zoom, zoom, zoom);
 
-		//check to see if level is complete -- if it is, delete it & load the next or exit
-		//main should have a queue of all the levels
-		if (currLev.isValid() && currLev->isComplete()) {
-			cout << "delete level -- move on to next!" << endl;
-			
-			//load next level or exit game here
-		}
+	if (currentMode != PLAY_GAME && currentMode != SHOW_PATH) {
+		glTranslatef(translate[0], translate[1], translate[2]);
+		glRotatef(rotateM[0], 1, 0, 0);
+		glRotatef(rotateM[1], 0, 1, 0);
+		glRotatef(rotateM[2], 0, 0, 1);
+		glScalef(zoom, zoom, zoom);
+	}
+	//check to see if level is complete -- if it is, delete it & load the next or exit
+	//main should have a queue of all the levels
+	if (currLev.isValid() && currLev->isComplete()) {
+		//load next level or exit game here
+		
+		// display
+	}
 
 	//if the current level exists
 	if (currLev.isValid()) {
@@ -220,19 +264,45 @@ void new_frame() {
 
 		//ball is inactive, so show the UI
 		if ( !ball->isActive() ) {
-			//run UI here
-			//allow UI to call ball's apply force with an impulse
-			//example:
-			//ball->applyForce(Vec3f(PI,1));
+			// show shooting UI if in playgame mode and game not complete
+			hud->setShowShootingUI(!currLev->isComplete() && currentMode == PLAY_GAME);
+
+			// if returning back to inactive form active
+			if (lastStateActive) {
+				// reattach menu
+				glutAttachMenu( GLUT_RIGHT_BUTTON );
+				
+				// if game not won, current stroke
+				if (!currLev->isComplete()) {
+					currLev->addStroke();
+				}
+			}
+		} else {
+			// detach menu to prevent menu from screwing up
+			glutDetachMenu( GLUT_RIGHT_BUTTON );
+			resetShooting();
+			hud->setShowShootingUI(false);
+
 		}
+		
+		lastStateActive = ball->isActive();
 
 		//this should be scrolling through the game manager's list of all Simulated objects
 		currLev->getBall()->doSimulation();
 		currLev->update();
+
+		
+		//cout << lastStateActive;
 	}
 
-	glPopMatrix();
-		
+
+	switchToOrtho();
+
+	// draw HUD here
+	hud->draw();
+
+	switchBackToFrustum();
+
 	glFlush();
 	glutSwapBuffers();
 	IMMObject::CollectGarbage();
@@ -240,7 +310,7 @@ void new_frame() {
 
 void cb_idle() {
 	double now = frameTimer.getElapsedTime();
-	
+
 	//start a new frame if proper amount of time has elapsed
 	if ( (now - currTime) > FRAME_TIME) {
 		currTime = now;
@@ -266,7 +336,11 @@ void cb_mouse( int button, int state, int x, int y )
 
 	// Store button state if mouse down
 	if (state == GLUT_DOWN) {	
-		currLev->getBall()->applyForce(Vec3f(PI,5));
+		if (currentMode = SHOW_PATH) {
+			currentMode = PLAY_GAME;
+			updateCamera();
+		}
+
 		btn[button] = 1;
 	} else {
 		btn[button] = 0;
@@ -405,6 +479,8 @@ void handle_menu( int ID ) {
 		exit(0);
 		break;
 	}
+	
+	updateCamera();
 	cout << endl;
 }		
 
@@ -423,6 +499,40 @@ void cb_keyboard(unsigned char key, int x, int y) {
 	case 'r':
 		resetTransformations();
 		break;
+	case 'x':
+		if (currentMode == PLAY_GAME){
+			currLev->getBall()->applyForce(Vec3f(angle,power * MAX_POWER));
+		}
+		break;
+	case 'b':
+		course->previousLevel();
+		currLev = course->getCurrentLevel();
+		currLev->resetLevel();
+		break;
+	case 'n':
+		// if (currLev->isComplete())
+		course->nextLevel();
+		currLev = course->getCurrentLevel();
+		currLev->resetLevel();
+		break;
+	case 'i':
+		if (power < 1.0)
+			power += 0.05;
+		break;
+	case 'k':
+		if ((power - 0.05) > 0.001)
+			power -= 0.05;
+		break;
+	case 'j':
+		angle += PI / 180;
+		if (angle > 2 * PI)
+			angle -= 2 * PI;
+		break;
+	case 'l':
+		angle -= PI / 180;
+		if (angle < 0)
+			angle += 2 * PI;
+		break;
 	}
 
 	updateCamera();
@@ -435,7 +545,7 @@ void cb_reshape(int w, int h) {
 
 int main(int argc, char** argv) {
 	char mG[] = "minigolf"; //test string for first parameter
-	
+
 	if ( argc != 3 || (strcmp(mG, argv[1]) != 0) ) {
 		Logger::Instance()->err("Usage Error: program requires two command line arguments in the form \"minigolf input_filename\"");
 		return(1);
@@ -443,16 +553,19 @@ int main(int argc, char** argv) {
 
 	//Initialize level
 	currLev = new level();
+	course = new Course();
 
 	//Initialize fileReader, read in file, quit if reader fails
 	fR = new fileReader();
-	if( !fR->readFile(argv[2], currLev) ) {
-		Logger::Instance()->err("file reader failed");
+	if( !fR->readCourseFile("courseTemp.db", course) ) {
+		Logger::Instance()->err("course file reader failed");
 		return(1);
 	}
 
+	currLev = course->getCurrentLevel();
+
 	glutInit(&argc, argv);
-	
+
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(viewportWidth, viewportHeight);
 	glutCreateWindow("Game Engine");
@@ -464,7 +577,7 @@ int main(int argc, char** argv) {
 	cout << "CMPS 164 - Lab 1: Minigolf Level Rendering" << endl;
 	cout << "==========================================" << endl << endl;
 	cout << "Instructions: " << endl;
-	cout << "Use Right Click to Select Modes. Starting Mode: CAMERA PAN." << endl;
+	cout << "Use Right Click to Select Modes. Starting Mode: PLAYGAME MODE. Use \"B\" and \"N\" to browse through uncompleted levels." << endl;
 
 	// Right Click Menu
 	glutCreateMenu( handle_menu );	// Setup GLUT popup menu
@@ -480,6 +593,8 @@ int main(int argc, char** argv) {
 	glutAttachMenu( GLUT_RIGHT_BUTTON );
 	cout << instructions[currentMode] << endl;
 
+	
+
 	//Callback functions
 	glutDisplayFunc(cb_display);
 	glutMouseFunc(cb_mouse);
@@ -489,7 +604,7 @@ int main(int argc, char** argv) {
 	glutKeyboardFunc(cb_keyboard);	
 
 	//glutSpecialFunc(specialKeyboard);  
-	
+
 	glClearDepth(1.0);
 	glClearColor(0,0,0,0); // set background color
 	glEnable(GL_DEPTH_TEST);
@@ -497,13 +612,13 @@ int main(int argc, char** argv) {
 	glEnable(GL_NORMALIZE);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glShadeModel(GL_SMOOTH);
-	
+
 	//Add positioned light
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-	
+
 	//initialize random number generator
 	srand((unsigned)time(0)); 
 
@@ -513,7 +628,7 @@ int main(int argc, char** argv) {
 
 	//for debugging
 	Logger* log = Logger::Instance();
-	
+
 	glutMainLoop();
 
 	return 0;

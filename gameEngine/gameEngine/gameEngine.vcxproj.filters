@@ -66,6 +66,12 @@
     <ClCompile Include="Simulated.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Course.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HUD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="util.h">
@@ -122,5 +128,19 @@
     <ClInclude Include="Plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Course.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HUD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="course.db">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="courseTemp.db">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

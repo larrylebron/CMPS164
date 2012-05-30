@@ -17,6 +17,7 @@ class ball :
 public:
 	ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius);
 	~ball();
+	void setPosition(Vec3f pos);
 	Vec3f getPosition();
 	void draw();
 	void doSimulation(); //handle ball movement at currTime in seconds
