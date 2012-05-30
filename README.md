@@ -1,14 +1,30 @@
-CMPS 164 Game Engines -- Lab 1 -- Minigolf level rendering
+CMPS 164 Game Engines -- Code Refactoring and Change Log
 Larry LeBron -- llebron@soe.ucsc.edu
 Kwong Fai Jonathan Lew -- klew3@ucsc.edu
 
-External Libraries Used:
+For this submission, we significantly refactored our engine, and implemented some changes and additions.
 
-Memory Management Classes by John Fine from:
-http://www.gamedev.net/page/resources/_/technical/game-programming/enginuity-part-ii-r1954
+Refactoring:
 
-Vec3f Library from:
-www.videotutorialsrock.com
+-PhysicsManager and RenderManager classes are now purely utilities to be used by simulated and drawable objects
+-Base GameObject class contains int ID and object normal
+-Drawable base class/interface forces implementation of a draw function, and stores a color for all drawable objects. Only
+	this class holds a reference to the renderManager.
+-Simulated base class/interface forces implementation of a doSimulation function, and stores a velocity, timer and other
+	essential physics related members. This is also the only class to hold a reference to the physicsManager.
+-Smart pointer memory management system is functioning, and releases memory allocated to level and gameObjects when references
+	no longer point to them.
 
-Timer class from:
-http://www.songho.ca/misc/timer/timer.html
+
+
+Additions:
+
+-Physics Manager can calculate sphere-plane and point-plane collision data, as well as intersection point and time
+-Simulated ball now accepts applications of force, rolls onto new tiles, bounces off walls, and enters the cup upon collision
+-Ball checks one frame ahead for collisions and updates velocity in the following frame as necessary
+-Tiles store friction data, which slows the ball as it rolls
+-The main game loop now allows for user input to impel the ball
+-Fixed camera bugs from previous submission
+-Updated loader complete with new logging
+-Implemented b and n for browsing through levels
+-Implemented HUD
