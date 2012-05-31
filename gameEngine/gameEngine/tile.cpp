@@ -86,19 +86,14 @@ vector<int> tile::getNeighbors() {
 
 string tile::toString() {
 	std::stringstream ss;
-	ss << "tile id: " << id << endl << "normal: " << normal[0] <<
-		", " << normal[1] << ", " << normal[2] << endl;
+	ss << "tile id: " << id << endl;
+	ss << "normal: " << normal << endl;
+	ss << "NumEdges: " << vertices.size() << endl;
+	ss << "Edges: " << endl;
+	for (unsigned int i = 0; i < neighbors.size(); i++) {
+		ss << edgePlanes[i]->toString();
+		ss << "neighbor tile id: " << neighbors[i] << endl;
+	}
+	ss << endl;
 	return ss.str();
-	/*
-	cout << "tile id: " << id << endl;
-	cout << "numVerts: " << vertices.size() << endl;
-	for (int i = 0; i < vertices.size(); i++) {
-		cout << vertices[i] << endl;
-	}
-	cout << "NumEdges: " << numEdges << endl;
-	for (int i = 0; i < numEdges; i++) {
-		cout << neighbors[i] << endl;
-	}
-	cout << "Normal: " << normal << endl;
-	*/
 }

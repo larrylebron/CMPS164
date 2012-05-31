@@ -26,14 +26,13 @@ bool ball::isInCup() {
 	return inCup;
 }
 
-
-void ball::setPosition(Vec3f pos) {
-	position = pos;
-}
-
 Vec3f ball::getPosition() {
 	Vec3f posCopy = position;
 	return posCopy;
+}
+
+void ball::setPosition(Vec3f pos) {
+	position = pos;
 }
 
 void ball::setTileMap(std::map<int, CMMPointer<tile>>* newTileMap) {
@@ -58,6 +57,8 @@ void ball::draw() {
 
 void ball::doSimulation() {
 
+	if (inCup) return;
+
 	//update timer
 	double currTime = timer.getElapsedTimeInSec();
 	double timeElapsed = currTime - lastFrameTime;
@@ -70,15 +71,21 @@ void ball::doSimulation() {
 	}
 
 	//check to see if the ball's velocity is greater than the friction
-	if (velocity.magnitude() >= DEFAULT_FRICTION_MAGNITUDE){ //currTile->getFrictionMagnitude() ) {
+	if (velocity.magnitude() >= currTile->getFrictionMagnitude() ) {
+		//ball has just been activated -- check for collisions this frame
+		if (!active) {
+			Vec3f endPos = pM->calcPosition(position, velocity, timeElapsed);//end position this frame
+			checkFutureCollision(position, endPos);//check for a collision one frame ahead
+		}
 		active = true;
 	} 
 	//if velocity magnitude is under the friction threshold, don't do anything
 	//reset the ball's parameters and make it inactive
-	else {
+	else if (active) {
 		velocity = Vec3f(0,0,0);
 		active = false;
 		resolveCollision = false;
+		cout << currTile->toString();
 		return;
 	}
 	
@@ -88,13 +95,18 @@ void ball::doSimulation() {
 		resolveCollision = false;
 	}
 
-	//apply friction to the future velocity
+	//apply friction & gravity to the velocity
 	velocity += calcFriction();
+	velocity += currTile->getGravityDirection() * GRAVITY_MAGNITUDE;
 
 	Vec3f endPos = pM->calcPosition(position, velocity, timeElapsed);//end position this frame
 	Vec3f futurePos = pM->calcPosition(endPos, velocity, FRAME_TIME);//end position next frame
 	checkFutureCollision(endPos, futurePos);//check for a collision one frame ahead
 	
+	//ensure ball sticks to tile
+	Vec3f tileNorm = currTile->getNormal();
+	endPos[1] = (-currTile->getDist() - endPos[0]*tileNorm[0] - endPos[2]*tileNorm[2])/tileNorm[1];
+
 	//set position by current velocity
 	position = endPos;
 
@@ -111,9 +123,11 @@ void ball::checkFutureCollision(Vec3f startPos, Vec3f endPos) {
 
 	vector<CMMPointer<Plane>> planes = currTile->getEdgePlanes();
 
-	for (unsigned int i = 0, collision = false; i < planes.size() && !resolveCollision; i++) {
+	for (unsigned int i = 0; i < planes.size() && !resolveCollision; i++) {
 
-		Vec3f* intPoint = pM->calcSpherePlaneIntersect(radius, startPos, endPos, planes[i]->getNormal(), planes[i]->getVertices() );
+		//Was calculating the intersect with an offset plane so it's the side of the ball -- but that might have been causing issues?
+		//Vec3f* intPoint = pM->calcSpherePlaneIntersect(radius, startPos, endPos, planes[i]->getNormal(), planes[i]->getVertices() );
+		Vec3f* intPoint = pM->calcPointPlaneIntersect(startPos, endPos, planes[i]->getNormal(), planes[i]->getDist() );
 	
 		//collides with plane i
 		if (intPoint) {
@@ -167,7 +181,6 @@ void ball::resolveNewTileEntry(int newTileId) {
 Vec3f ball::calcFriction() {
 	if (velocity.magnitude() == 0) return Vec3f(0,0,0);//if ball is stationary
 	return velocity.normalize() * -1 * currTile->getFrictionMagnitude();
-
 }
 
 string ball::toString() {

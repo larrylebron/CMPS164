@@ -33,6 +33,7 @@ const Vec3f TILE_COLOR(0.0f, 0.9f, 0.0f);
 const Vec3f HIGHLIGHT_COLOR(1,1,1);
 const Vec3f WORLD_UP_VECTOR(0,1,0);
 const float DEFAULT_FRICTION_MAGNITUDE = .05;//the velocity magnitude under which the ball won't move
+const float GRAVITY_MAGNITUDE = .06;
 const float MAX_POWER = 10;
 const float KEEP_LAST_SHOOTING_SETTINGS = false;
 

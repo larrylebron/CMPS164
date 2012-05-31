@@ -9,7 +9,7 @@
 #include "tile.h"
 
 //time to delay after a collision to avoid double-triggering
-static const double TILE_REENTRY_DELAY_TIME = .2;
+static const double TILE_REENTRY_DELAY_TIME = .4;
 
 class ball :
 	public GameObject, public Drawable, public Simulated
@@ -17,8 +17,8 @@ class ball :
 public:
 	ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius);
 	~ball();
-	void setPosition(Vec3f pos);
 	Vec3f getPosition();
+	void setPosition(Vec3f pos);
 	void draw();
 	void doSimulation(); //handle ball movement at currTime in seconds
 	void ball::setCurrTile(CMMPointer<tile> newTile); //set the ball's current tile

@@ -16,6 +16,14 @@ Plane::Plane(vector<Vec3f> pVertices, int pId)
 
 	//Initialize the simple bounds for quick testing
 	initBounds();
+
+	//if the min/max y vertices are equal, plane is flat, set gravity direction to 0
+	if(minBounds[1] == maxBounds[1]) {
+		gravityDirection = Vec3f(0,0,0);
+	} else {
+		//set the gravity direction for a sloped tile
+		gravityDirection = PhysicsManager::Instance()->calcPlaneGravityDirection(normal);
+	}
 }
 	
 Plane::~Plane()
@@ -43,8 +51,12 @@ bool Plane::containsPoint(Vec3f p) {
 	//first check p against the simple bounding box
 	if (p[0] < minBounds[0] || p[1] < minBounds[1] || p[2] < minBounds[2] ||
 		p[0] > maxBounds[0] || p[1] > maxBounds[1] || p[2] > maxBounds[2]) return false;
+	return true;
+	//was using this more complicated successive checking, but I think it was actualy too precise
+	//for the level files
 
 	//check p against infinite plane
+	/*
 	if ( p.dot(normal) != dist ) return false;
 	
 
@@ -59,6 +71,7 @@ bool Plane::containsPoint(Vec3f p) {
        in = !in;
   }
   return in;
+  */
 }
 
 float Plane::getDist() {
@@ -72,11 +85,11 @@ vector<Vec3f> Plane::getVertices() {
 
 string Plane::toString() {
 	std::stringstream ss;
-	ss << "Plane " << id << ": \n";
-	ss << "normal: " << normal;
-	ss << endl;
+	ss << "\nPlane " << id << ": \n";
+	ss << "normal: " << normal << endl;
+	ss << "vertices: \n";
 	for (unsigned int i = 0; i < vertices.size(); i++) {
 		ss << vertices[i] << endl;
-	}	
+	}
 	return ss.str();
 }

@@ -18,12 +18,14 @@ public:
 	//return the vector of plane vertices
 	vector<Vec3f> getVertices();
 	float getDist();
+	Vec3f getGravityDirection() {return gravityDirection;}
 	string toString();
 	AUTO_SIZE;
 protected:
 	static int planeIdCount;//counter for plane id
 	vector<Vec3f> vertices; //the vertices comprising this plane
 	float dist; //dist value from origin for any point on the plane according to Ax + By + Cz + d = 0
+	Vec3f gravityDirection; //the direction that gravity will project an object down the plane if it's sloped
 private:
 	void initBounds();//initialize the simple bounds vectors
 	Vec3f minBounds; // contains the minimum x, y, z vertex values

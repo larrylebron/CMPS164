@@ -287,14 +287,9 @@ void new_frame() {
 		
 		lastStateActive = ball->isActive();
 
-		//this should be scrolling through the game manager's list of all Simulated objects
 		currLev->getBall()->doSimulation();
 		currLev->update();
-
-		
-		//cout << lastStateActive;
 	}
-
 
 	switchToOrtho();
 
@@ -336,7 +331,7 @@ void cb_mouse( int button, int state, int x, int y )
 
 	// Store button state if mouse down
 	if (state == GLUT_DOWN) {	
-		if (currentMode = SHOW_PATH) {
+		if (currentMode == SHOW_PATH) {
 			currentMode = PLAY_GAME;
 			updateCamera();
 		}
@@ -500,7 +495,7 @@ void cb_keyboard(unsigned char key, int x, int y) {
 		resetTransformations();
 		break;
 	case 'x':
-		if (currentMode == PLAY_GAME){
+		if (!currLev->isComplete() && currentMode == PLAY_GAME){
 			currLev->getBall()->applyForce(Vec3f(angle,power * MAX_POWER));
 		}
 		break;
@@ -557,7 +552,7 @@ int main(int argc, char** argv) {
 
 	//Initialize fileReader, read in file, quit if reader fails
 	fR = new fileReader();
-	if( !fR->readCourseFile("courseTemp.db", course) ) {
+	if( !fR->readCourseFile(argv[2], course) ) {
 		Logger::Instance()->err("course file reader failed");
 		return(1);
 	}

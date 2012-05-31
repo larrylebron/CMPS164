@@ -46,6 +46,12 @@ Vec3f PhysicsManager::calcPlaneNormal(vector<Vec3f> vertices) {
 	return norm.normalize();
 }
 
+Vec3f PhysicsManager::calcPlaneGravityDirection(Vec3f planeNormal) {
+	Vec3f perp = planeNormal.cross(WORLD_UP_VECTOR);
+	Vec3f gravityVector = planeNormal.cross(perp);
+	return gravityVector.normalize();
+}
+
 float PhysicsManager::calcPointPlaneIntersectTime(Vec3f startPos, Vec3f endPos, Vec3f planeNormal, float planeDist) {
 	Vec3f ray = endPos - startPos;
 	return -(planeNormal.dot(startPos) + planeDist) / ray.dot(planeNormal);

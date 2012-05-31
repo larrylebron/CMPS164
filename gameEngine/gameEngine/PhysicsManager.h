@@ -18,6 +18,9 @@ public:
    //Return the normal of the plane comprised of at least 3 vertices
    Vec3f calcPlaneNormal(vector<Vec3f> vertices);
 
+   //Return the normalized direction vector that gravity will project onto a plane
+   Vec3f calcPlaneGravityDirection(Vec3f planeNormal);
+
    //Returns the time that the point intersects the plane
    float calcPointPlaneIntersectTime(Vec3f startPos, Vec3f endPos, Vec3f planeNormal, float planeDist);
 

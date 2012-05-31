@@ -164,8 +164,6 @@ void level::update() {
 	std::map<int, CMMPointer<ball>>::iterator itB;
 	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
 		(*itB).second->draw();
-		//(*itB).second->setCurrTile(getCurrTile());//update the ball's current tile -- only needed at init?
-
 	}
 	
 	std::map<int, CMMPointer<cup>>::iterator itC;

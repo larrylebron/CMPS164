@@ -17,10 +17,10 @@ void Wall::draw() {
 
 string Wall::toString() {
 	std::stringstream ss;
-	ss << endl;
 	
-	ss << "Wall " << id << ": \n";
+	ss << "\nWall " << id << ": \n";
 	ss << "normal: " << normal << endl;
+	ss << "vertices: \n";
 	for (unsigned int i = 0; i < vertices.size(); i++) {
 		ss << vertices[i] << endl;
 	}

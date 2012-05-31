@@ -41,14 +41,13 @@ bool fileReader::readCourseFile(char* filename, CMMPointer<Course> course) {
 	bool beganTile = false;
 	CMMPointer<level> newLevel;
 
-	getline(mapInput, line);
+	while (getline(mapInput, line)) {
 
-	while (line.length() > 0) {
 		vector<string> tokens = strSplit(line);
 
 		// first token to the dataType
 		string type = tokens[0];
-
+		
 		//A string stream of the line number for the logger
 		std::stringstream sLineNumber;
 		sLineNumber << lineNumber;
@@ -191,7 +190,6 @@ bool fileReader::readCourseFile(char* filename, CMMPointer<Course> course) {
 
 		}
 		lineNumber++;
-		getline(mapInput, line);
 	}
 
 	mapInput.close();
