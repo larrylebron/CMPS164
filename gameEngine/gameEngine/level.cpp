@@ -176,7 +176,6 @@ void level::update() {
 // reset ball positions to tee position
 void level::resetLevel()
 {
-	cout << "reseting" << endl;
 	resetBallPos();
 	complete = false;
 }

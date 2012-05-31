@@ -85,7 +85,7 @@ void ball::doSimulation() {
 		velocity = Vec3f(0,0,0);
 		active = false;
 		resolveCollision = false;
-		cout << currTile->toString();
+		//cout << currTile->toString();
 		return;
 	}
 	
