@@ -14,6 +14,7 @@ tile::tile(int pID, vector<Vec3f> pVertices, vector<int> pNeighbors, Vec3f pColo
 
 	highlighted = false;
 	frictionMagnitude = pFrictionMagnitude;
+	containsCup = false;
 }
 
 void tile::toggleHighlight() {

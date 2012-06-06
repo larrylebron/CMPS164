@@ -1,6 +1,5 @@
 #include "ball.h"
 
-
 //ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius, CMMPointer<level> pCurrLev)
 ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius)
 	: GameObject(pID), Drawable(pColor)
@@ -9,11 +8,8 @@ ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius)
 	radius = pRadius;
 
 	currTile = 0;
-	lastTileId = 0;
 	tileMap = 0;
 
-	enteredNewTileTime = 0;
-	delayTileReentry = false;
 	inCup = false;
 }
 
@@ -45,15 +41,13 @@ void ball::setCupPos(Vec3f pCupPos) {
 
 void ball::setCurrTile(CMMPointer<tile> newTile) {
 	currTile = newTile;
-	currTileNormal = currTile->getNormal();
-	currTile->toggleHighlight();
-	lastTileId = currTile->getID();
 }
 
 void ball::draw() {
 	//draw the ball -- add radius to position in normal direction so it isn't in the ground
 	if (!inCup)renderManager::Instance()->drawSphere(radius, normal, position + normal*radius, color);
 }
+
 
 void ball::doSimulation() {
 
@@ -71,116 +65,121 @@ void ball::doSimulation() {
 	}
 
 	//check to see if the ball's velocity is greater than the friction
-	if (velocity.magnitude() >= currTile->getFrictionMagnitude() ) {
-		//ball has just been activated -- check for collisions this frame
-		if (!active) {
-			Vec3f endPos = pM->calcPosition(position, velocity, timeElapsed);//end position this frame
-			checkFutureCollision(position, endPos);//check for a collision one frame ahead
-		}
+	if (velocity.magnitude() >= currTile->getFrictionMagnitude() || currTile->isSloped()) {
 		active = true;
 	} 
 	//if velocity magnitude is under the friction threshold, don't do anything
 	//reset the ball's parameters and make it inactive
-	else if (active) {
+	else {
 		velocity = Vec3f(0,0,0);
 		active = false;
-		resolveCollision = false;
-		//cout << currTile->toString();
 		return;
 	}
 	
-	//resolve a collision detected last frame
-	if (resolveCollision) {
-		velocity = postCollisionVelocity;
-		resolveCollision = false;
-	}
-
 	//apply friction & gravity to the velocity
-	velocity += calcFriction();
 	velocity += currTile->getGravityDirection() * GRAVITY_MAGNITUDE;
+	velocity += pM->calcFrictionVector(currTile->getFrictionMagnitude(), velocity);
 
-	Vec3f endPos = pM->calcPosition(position, velocity, timeElapsed);//end position this frame
-	Vec3f futurePos = pM->calcPosition(endPos, velocity, FRAME_TIME);//end position next frame
-	checkFutureCollision(endPos, futurePos);//check for a collision one frame ahead
+	//handle any collisions this step
+	if ( !handleCollisions(timeElapsed) ) {
+		//end position this frame if there wasn't a collision
+		position = pM->calcPosition(position, velocity, timeElapsed);
+	}
 	
 	//ensure ball sticks to tile
 	Vec3f tileNorm = currTile->getNormal();
-	endPos[1] = (-currTile->getDist() - endPos[0]*tileNorm[0] - endPos[2]*tileNorm[2])/tileNorm[1];
-
-	//set position by current velocity
-	position = endPos;
+	position[1] = (-currTile->getDist() - position[0]*tileNorm[0] - position[2]*tileNorm[2])/tileNorm[1];
 
 	//If this tile has a cup, check for collison with the cup
 	if (currTile->hasCup()) checkCupCollision();
 }
 
-void ball::checkCupCollision() {
-	Vec3f cupRay = cupPos - position;
-	if (cupRay.magnitude() <= CUP_RADIUS) inCup = true;
+bool ball::handleCollisions(double timeElapsed) {
+
+	//would eventually update this to check against all simulated objects on the tile
+	vector<CMMPointer<Plane>> planes = currTile->getEdgePlanes();
+	bool collisionHandled = false;
+
+	for (unsigned int i = 0; i < planes.size() && !collisionHandled; i++) {
+
+		//get the time until the ball will collide with this plane
+		float collTime = pM->calcPointPlaneIntersectTime(position, velocity, planes[i]->getNormal(), planes[i]->getDist());
+		
+		if (collTime >= 0 && collTime <= timeElapsed) {
+			Vec3f collPos = pM->calcPosition(position, velocity, collTime);
+
+			//set the ball's position to the point of collision -- not sure if this is desirable
+			position = collPos;
+
+			//updates velocity after collision
+			handleEdgePlaneCollision(i, planes[i]);
+
+			//handle the rest of the ball's movement this step
+			double timeRemaining = timeElapsed - collTime; 
+			position = pM->calcPosition(position, velocity, timeRemaining);
+
+			//break out of the for loop
+			collisionHandled = true;
+		}//collTime is >= 0
+	}//potential collision objects for loop
+
+	//Was a collision handled this step?
+	return collisionHandled;
+
+}//end handleCollisions
+
+void ball::handleEdgePlaneCollision(int edgeIndex, CMMPointer<Plane> p) {
+	
+	vector<int> neighbors = currTile->getNeighbors();
+
+	//wall collision
+	if (neighbors[edgeIndex] == 0) {
+		velocity = pM->calcPlaneReflectionVelocity(velocity, p->getNormal());
+	}
+	//new tile entry
+	else resolveNewTileEntry(neighbors[edgeIndex]); 
 }
 
-void ball::checkFutureCollision(Vec3f startPos, Vec3f endPos) {
+//if ball leaves the level, move it back a step and recheck collision
+void ball::checkMissedCollision(CMMPointer<tile> tileByPosition) {
 
-	vector<CMMPointer<Plane>> planes = currTile->getEdgePlanes();
-
-	for (unsigned int i = 0; i < planes.size() && !resolveCollision; i++) {
-
-		//Was calculating the intersect with an offset plane so it's the side of the ball -- but that might have been causing issues?
-		//Vec3f* intPoint = pM->calcSpherePlaneIntersect(radius, startPos, endPos, planes[i]->getNormal(), planes[i]->getVertices() );
-		Vec3f* intPoint = pM->calcPointPlaneIntersect(startPos, endPos, planes[i]->getNormal(), planes[i]->getDist() );
-	
-		//collides with plane i
-		if (intPoint) {
-			resolveCollision = true; //resolve this collision next frame
-			vector<int> neighbors = currTile->getNeighbors();
-
-			//wall collision
-			if (neighbors[i] == 0) {
-				postCollisionVelocity = pM->calcPlaneReflectionVelocity(velocity, planes[i]->getNormal());
-				}
-			//new tile entry
-			else {
-				//if trying to reenter last tile, check to see if time is up
-				if (delayTileReentry && lastTileId == neighbors[i]) {
-					if ( (timer.getElapsedTime() - enteredNewTileTime) > TILE_REENTRY_DELAY_TIME) 
-						delayTileReentry = false; //delay time is up
-				} else {
-					resolveNewTileEntry(neighbors[i]); 
-				}//resolve tile else
-			}//new tile else
-		}//collision detected 
-		delete intPoint; //deallocate the memory
-	}//checking for collisions against planes
-}//doSimulation
+	//if the tile is invalid or ball isn't on this tile
+	if (!tileByPosition.isValid() || tileByPosition!= currTile){
+		//move position back a frame
+		position = lastGoodPosition;
+		currTile = lastGoodTile;
+		active = false;
+	}
+	else {
+		lastGoodPosition = position;
+		lastGoodTile = tileByPosition;
+	}
+}
+		
 
 void ball::resolveNewTileEntry(int newTileId) {
 
-	//set reentry delay params
-	enteredNewTileTime = timer.getElapsedTime();
-	delayTileReentry = true;
-	lastTileId = currTile->getID();
+	//the newTile to be entered
+	CMMPointer<tile> newTile = (*tileMap)[newTileId]; 
 
-	currTile->toggleHighlight();//turn off tile's highlight
-	currTile = (*tileMap)[newTileId]; //set the new tile as currTile
-	currTile->toggleHighlight(); //turn on new tile's highlight
-
-	Vec3f newNormal = currTile->getNormal();
-
-	//compensate for change in normal by setting new velocity
-	if (currTileNormal != newNormal) {
+	//compensate for change in normal by setting new velocity, otherwise velocity remains constant
+	if ( currTile->getNormal() != newTile->getNormal() ) {
 		
-		Vec3f perp = velocity.cross(WORLD_UP_VECTOR);
-		Vec3f newDirection = (perp.cross(newNormal)).normalize();
-		postCollisionVelocity = -newDirection;
-	} else {
-		postCollisionVelocity = velocity;
-	}
-	currTileNormal = newNormal;
+		//from formula in CMPS164 assignment description
+		Vec3f currDirection = velocity.normalize();
+		Vec3f perpPlane = currDirection.cross(WORLD_UP_VECTOR);
+		//needed to invert this for some reason
+		Vec3f newDirection = - perpPlane.cross( newTile->getNormal() ).normalize();
+		velocity = newDirection * velocity.magnitude();
+	} 
+	//update currTile
+	currTile = newTile;
 }
 
-Vec3f ball::calcFriction() {
-	if (velocity.magnitude() == 0) return Vec3f(0,0,0);//if ball is stationary
-	return velocity.normalize() * -1 * currTile->getFrictionMagnitude();
+
+void ball::checkCupCollision() {
+	Vec3f cupRay = cupPos - position;
+	if (cupRay.magnitude() <= CUP_RADIUS) inCup = true;
 }
 
 string ball::toString() {

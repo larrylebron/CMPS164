@@ -19,15 +19,6 @@ PhysicsManager* PhysicsManager::Instance()
 }
 
 
-Vec3f PhysicsManager::calcForces() {
-	Vec3f result;
-	
-	//iterate through forces --might need to pass in velocity?
-
-	//The resultant force
-	return result;
-}
-
 Vec3f PhysicsManager::calcPosition(Vec3f position, Vec3f velocity, float timeElapsed) {
 	return position + velocity * timeElapsed; //closed form projectile equation of motion
 }
@@ -52,38 +43,27 @@ Vec3f PhysicsManager::calcPlaneGravityDirection(Vec3f planeNormal) {
 	return gravityVector.normalize();
 }
 
-float PhysicsManager::calcPointPlaneIntersectTime(Vec3f startPos, Vec3f endPos, Vec3f planeNormal, float planeDist) {
-	Vec3f ray = endPos - startPos;
-	return -(planeNormal.dot(startPos) + planeDist) / ray.dot(planeNormal);
+ Vec3f PhysicsManager::calcFrictionVector(float frictionMagnitude, Vec3f velocity) {
+	if (velocity.magnitude() == 0) return Vec3f(0,0,0);//if object is stationary
+	return velocity.normalize() * -1 * frictionMagnitude;
+ }
 
+float PhysicsManager::calcPointPlaneIntersectTime(Vec3f startPos, Vec3f velocity, Vec3f planeNormal, float planeDist) {
+	return -(planeNormal.dot(startPos) + planeDist) / velocity.dot(planeNormal);
 }
 
-Vec3f* PhysicsManager::calcPointPlaneIntersect(Vec3f startPos, Vec3f endPos, Vec3f planeNormal, float planeDist) {
-	
-	float p = startPos.dot(planeNormal) + planeDist;
-	//used to determine if the start/end positions changed relative to the plane
-	enum {PlaneFront, PlaneBack, OnPlane};
-	int pStartLoc;
-	int pDestLoc;
-    if ( p > 0.0f ) pStartLoc = PlaneFront;
-    else if ( p < 0.0f ) pStartLoc = PlaneBack;
-    else pStartLoc = OnPlane;
-    
-	
-    p = endPos.dot(planeNormal) + planeDist;
-    if( p > 0.0f ) pDestLoc = PlaneFront;
-    else if (p < 0.0f ) pDestLoc = PlaneBack;
-    else pDestLoc = OnPlane;
-
-    if (pStartLoc == pDestLoc) return NULL;
+bool PhysicsManager::pointPlaneIntersect(Vec3f startPos, Vec3f velocity, float duration, Vec3f planeNormal, float planeDist) {
 	
 	//get the length of time after startPos to collison
-	float collTime = calcPointPlaneIntersectTime(startPos, endPos, planeNormal, planeDist);
-	
-	return new Vec3f(calcPosition(startPos, endPos-startPos, collTime));
+	float collTime = calcPointPlaneIntersectTime(startPos, velocity, planeNormal, planeDist);
+
+	//collides in this duration
+	if (collTime >= 0 && collTime <= duration) return true;
+	else return false;
 }
 
-Vec3f* PhysicsManager::calcSpherePlaneIntersect(float radius, Vec3f startPos, Vec3f endPos, Vec3f planeNormal, vector<Vec3f> planeVertices ) {
+float PhysicsManager::calcSpherePlaneIntersectTime(float radius, Vec3f startPos, Vec3f velocity, Vec3f planeNormal, vector<Vec3f> planeVertices ) {
+	
 	//offset the plane in the direction of its normal by the radius of the sphere
 	Vec3f offset = radius * planeNormal;
 
@@ -95,9 +75,9 @@ Vec3f* PhysicsManager::calcSpherePlaneIntersect(float radius, Vec3f startPos, Ve
 	//calculate offset plane dist
 	float planeDist = -planeNormal.dot(planeVertices[0]);
 
-	Vec3f* collPoint = calcPointPlaneIntersect(startPos, endPos, planeNormal, planeDist);
-	if (collPoint) return collPoint; //if the point was a valid collision on the offset plane
-	return NULL;
+	//return the time at which the sphere's center hits the offset plane
+	//same as the time the sphere's side hits the original plane
+	return calcPointPlaneIntersectTime(startPos, velocity, planeNormal, planeDist);
 }
 
 Vec3f PhysicsManager::calcPlaneReflectionVelocity(Vec3f velocity, Vec3f planeNormal) {

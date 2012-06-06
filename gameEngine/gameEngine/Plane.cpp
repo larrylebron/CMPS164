@@ -20,9 +20,11 @@ Plane::Plane(vector<Vec3f> pVertices, int pId)
 	//if the min/max y vertices are equal, plane is flat, set gravity direction to 0
 	if(minBounds[1] == maxBounds[1]) {
 		gravityDirection = Vec3f(0,0,0);
+		sloped = false;
 	} else {
 		//set the gravity direction for a sloped tile
 		gravityDirection = PhysicsManager::Instance()->calcPlaneGravityDirection(normal);
+		sloped = true;
 	}
 }
 	
@@ -46,7 +48,7 @@ void Plane::initBounds() {
 	}
 }
 
-bool Plane::containsPoint(Vec3f p) {	
+bool Plane::inSimpleBounds(Vec3f p) {	
 
 	//first check p against the simple bounding box
 	if (p[0] < minBounds[0] || p[1] < minBounds[1] || p[2] < minBounds[2] ||
@@ -54,24 +56,30 @@ bool Plane::containsPoint(Vec3f p) {
 	return true;
 	//was using this more complicated successive checking, but I think it was actualy too precise
 	//for the level files
+}
 
+bool Plane::preciseContainsPoint(Vec3f p) {
 	//check p against infinite plane
-	/*
-	if ( p.dot(normal) != dist ) return false;
 	
+	if ( p.dot(normal) != dist ) return false;
 
-	//Check p against finite plane's dimensions
-	//The following code is adapted from Randolph Franklin's http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#3D%20Polygons
+	/*draw a vector from point to each vertex
+	If the sum of all angles is very close to 2PI, it's on the finite plane
+	*/
+	double angleSum = 0;
+	
+	for (unsigned int i = 0; i < vertices.size(); i++) {
+		Vec3f v1 = (p - vertices[i]).normalize();
+		
+		//make sure it loops around
+		Vec3f v2 = (i == vertices.size()-1) ? (p-vertices[0]).normalize() : (p - vertices[i+1]).normalize();
 
-  unsigned int i, j = 0;
-  bool in = false;
-  for (i = 0, j = vertices.size()-1; i < vertices.size(); j = i++) {
-    if ( ((vertices[i][2]>p[2]) != (vertices[j][2]>p[2])) &&
-	 (p[0] < (vertices[j][0]-vertices[i][0]) * (p[2]-vertices[i][2]) / (vertices[j][2]-vertices[i][2]) + vertices[i][0]) )
-       in = !in;
-  }
-  return in;
-  */
+		angleSum += acos(v1.dot(v2));
+	}
+	if ( fabs(angleSum - (2 * PI)) < 0.1)
+        return true;
+    else
+        return false;
 }
 
 float Plane::getDist() {

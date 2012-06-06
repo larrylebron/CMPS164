@@ -9,7 +9,7 @@ level::level()
 	numCups = 0;
 	complete = false;
 	par = 1;
-	strokes = 1;
+	strokes = 0;
 }
 
 level::~level()
@@ -85,7 +85,7 @@ CMMPointer<tile> level::getTileContainingPoint(Vec3f point) {
 	std::map<int, CMMPointer<tile>>::iterator it;
 	for ( it=tiles.begin() ; it != tiles.end(); it++ ) {
 		CMMPointer<tile> checkTile = (*it).second;
-		if ( checkTile->containsPoint(point) ) return checkTile; //return pointer to current tile
+		if ( checkTile->inSimpleBounds(point) ) return checkTile; //return pointer to current tile
 	}
 	return CMMPointer<tile>();
 }
@@ -133,7 +133,7 @@ void level::setComponentParams() {
 	//initialize the ball's current tile
 	Vec3f ballPos = ball->getPosition();
 	CMMPointer<tile> ballTile = getTileContainingPoint(ballPos);
-	if (!ballTile) Logger::Instance()->err("ball not on any tile");
+	if (!ballTile.isValid()) Logger::Instance()->err("ball not on any tile");
 	ball->setCurrTile(ballTile); 
 
 	//set the tile reference map
@@ -155,6 +155,12 @@ void level::update() {
 	if ( (*balls.begin()).second->isInCup() ) {
 		complete = true;
 	}
+
+	//If ball goes out of bounds handle it
+	CMMPointer<ball> b = (*balls.begin()).second;
+	Vec3f ballPos = b->getPosition();
+	CMMPointer<tile> ballTile = getTileContainingPoint(ballPos);
+	b->checkMissedCollision(ballTile);
 
 	std::map<int, CMMPointer<tile>>::iterator it;
 	for ( it=tiles.begin(); it != tiles.end(); it++ ) {
