@@ -200,12 +200,12 @@ bool level::runBallSimulation() {
 	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
 		CMMPointer<ball> b = (*itB).second;
 		b->doSimulation(); //run the ball's simulation
-		
+
 		//If ball misses a collision, handle it
 		Vec3f ballPos = b->getPosition();
 		CMMPointer<tile> ballTile = getTileContainingPoint(ballPos);
 		b->checkMissedCollision(ballTile);
-
+		
 		currentlyActive = currentlyActive || b->isActive(); //testing to see if level is active
 	}
 

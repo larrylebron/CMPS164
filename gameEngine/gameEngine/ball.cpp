@@ -151,11 +151,9 @@ void ball::handleEdgePlaneCollision(int edgeIndex, CMMPointer<Plane> p) {
 void ball::checkMissedCollision(CMMPointer<tile> tileByPosition) {
 
 	//if the tile is invalid or ball isn't on this tile
-	if (!tileByPosition.isValid() || tileByPosition!= currTile){
-		//move position back a frame
+	if (!tileByPosition.isValid() ) {
 		position = lastGoodPosition;
 		currTile = lastGoodTile;
-		active = false;
 	}
 	else {
 		lastGoodPosition = position;
@@ -194,12 +192,35 @@ void ball::handleBallCollisions() {
 		if ( id != b->getID() ) {
 			if (pM->spheresCollide(position, radius, b->getPosition(), b->getRadius()) ) {
 				//if all else fails, this works though it sometimes misses a collision
-				b->applyForce(velocity);
-				velocity = Vec3f(0,0,0);
-			}
-		}
-	}
-}
+				//b->applyForce(velocity);
+				//velocity = Vec3f(0,0,0);
+				//from NEHE sphere collision http://nehe.gamedev.net/tutorial/collision_detection/17005/
+				//normalized x axis of the collision
+				cout << "collides";
+				Vec3f xAxis = (b->getPosition() - position).normalize();
+				//the projected velocity of this ball along x
+				Vec3f U1x = xAxis * (xAxis.dot(velocity));
+				//the projected velocity of the ball along the axis perp to x
+				Vec3f v1y = velocity - U1x;
+				//the projected velocity of the other ball along x
+				Vec3f U2x = -xAxis * (-xAxis.dot(b->getVelocity()));
+				//the projeced velocity of the other ball along the axis perp to x
+				Vec3f v2y = b->getVelocity() - U2x;
+				
+				//easy because we're making mass of each ball = 1
+				//woulde be more complicated with different masses
+				//set this ball's new projected x velocity
+				Vec3f v1x = U2x;
+				//set the other ball's new projected x velocity
+				Vec3f v2x = U1x;
+				
+				velocity = v1x + v1y;
+				b->setVelocity(v2x + v2y);
+			}//collision has occurred
+		}//not this ball
+	}//checking for collisions with balls on tile
+}//handle ball collision
+
 
 void ball::checkCupCollision() {
 	Vec3f cupRay = cupPos - position;
