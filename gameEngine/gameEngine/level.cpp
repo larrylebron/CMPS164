@@ -8,6 +8,7 @@ level::level()
 	numTees = 0;
 	numCups = 0;
 	complete = false;
+	active = false;
 	par = 1;
 	strokes = 1;
 }
@@ -51,8 +52,8 @@ void level::addCup(int pId, CMMPointer<cup>* pCup) {
 	cups[pId] = *pCup;
 }
 
-CMMPointer<ball> level::getBall(int pId) {
-	return balls[pId];
+CMMPointer<ball> level::getBall(int pID) {
+	return balls[pID];
 }
 
 Vec3f level::getBallPos(int pId) {
@@ -61,6 +62,10 @@ Vec3f level::getBallPos(int pId) {
 
 Vec3f level::getTeePos() {
 	return (*tees.begin()).second->getPosition();
+}
+
+bool level::isActive() {
+	return active;
 }
 
 void level::resetBallPos() {
@@ -169,11 +174,8 @@ void level::update(bool isBocce, int numTotalBalls) {
 		}
 	}
 
-	//If ball goes out of bounds handle it
-	CMMPointer<ball> b = (*balls.begin()).second;
-	Vec3f ballPos = b->getPosition();
-	CMMPointer<tile> ballTile = getTileContainingPoint(ballPos);
-	b->checkMissedCollision(ballTile);
+	//Run the simulation for all balls in the level
+	active = runBallSimulation();
 
 	std::map<int, CMMPointer<tile>>::iterator it;
 	for ( it=tiles.begin(); it != tiles.end(); it++ ) {
@@ -189,6 +191,25 @@ void level::update(bool isBocce, int numTotalBalls) {
 	for ( itC=cups.begin(); itC != cups.end(); itC++ ) {
 		(*itC).second->draw();
 	}
+}
+
+bool level::runBallSimulation() {
+	bool currentlyActive = false;
+
+	std::map<int, CMMPointer<ball>>::iterator itB;
+	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
+		CMMPointer<ball> b = (*itB).second;
+		b->doSimulation(); //run the ball's simulation
+		
+		//If ball misses a collision, handle it
+		Vec3f ballPos = b->getPosition();
+		CMMPointer<tile> ballTile = getTileContainingPoint(ballPos);
+		b->checkMissedCollision(ballTile);
+
+		currentlyActive = currentlyActive || b->isActive(); //testing to see if level is active
+	}
+
+	return currentlyActive;
 }
 
 

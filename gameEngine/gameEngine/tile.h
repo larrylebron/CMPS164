@@ -4,11 +4,12 @@
 #define TILE_H
 #pragma once
 
-#include <map>
+#include <list>
 #include "util.h"
 #include "Wall.h"
 #include "Drawable.h"
 #include "GameObject.h"
+
 class tile :
 	public Plane, Drawable
 {
@@ -30,12 +31,21 @@ public:
 	float getFrictionMagnitude() {return frictionMagnitude;}
 	bool hasCup();
 	void setContainsCup(bool hasCup);
+
+	 //add a ball to this tile
+	void addBall(GameObject* b) {balls.push_back(b);}
+	//remove the ball from this tile
+	void removeBall(GameObject* b) {balls.remove(b);}
+	//get the list of balls on this tile
+	std::list< GameObject* > getBalls() {return balls;}
+	
 	//print info about this tile
 	string toString();
 	AUTO_SIZE;
 private:
 	vector<int> neighbors; //ids of neighboring tiles, indexed by edge number
 	vector< CMMPointer<Plane> > edgePlanes; //the edge planes & walls used to test for ball collision
+	std::list< GameObject* > balls; //vector of the balls on this tile
 	void buildEdgePlanes(); //build the tile's walls and bounding planes
 	bool highlighted; //tracks whether the tile is highlighted for debugging
 	bool containsCup; //does the tile have a cup?

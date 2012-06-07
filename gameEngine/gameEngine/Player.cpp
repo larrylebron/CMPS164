@@ -20,7 +20,7 @@ void Player::setName(string name){
 }
 
 vector<int> Player::getScores(){
-	return scores
+	return scores;
 }
 
 void Player::addNewScore(int score){

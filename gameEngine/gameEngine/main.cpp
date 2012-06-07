@@ -271,19 +271,20 @@ void new_frame() {
 		CMMPointer<ball> aBall = currLev->getBall(currBall);
 
 		//ball is inactive, so show the UI
-		if ( !aBall->isActive() ) {
+		if ( !currLev->isActive() ) {
 			// show shooting UI if in playgame mode and game not complete
 			hud->setShowShootingUI(!currLev->isComplete() && currentMode == PLAY_GAME);
 
-			cout << currLev->getPlayerTurn();
+			//cout << currLev->getPlayerTurn();
 			
 			if (gType == BOCCE && !currLev->isComplete() && lastStateActive) {
 				
 				Vec3f color = (currBall % 2 == 0) ? BALL_P1_COLOR : BALL_P2_COLOR;
 
-				CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(0, currLev->getTeePos(), color, BALL_RADIUS));
-				currLev->addBall(currBall + 1, tempBall, true);
 				currBall++;
+				CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(currBall, currLev->getTeePos(), color, BALL_RADIUS));
+				currLev->addBall(currBall, tempBall, true);
+				
 			}
 
 			// if returning back to inactive form active	
@@ -305,9 +306,7 @@ void new_frame() {
 
 		}
 		
-		lastStateActive = aBall->isActive();
-
-		aBall->doSimulation();
+		lastStateActive = currLev->isActive();
 		currLev->update(isBocce);
 	}
 
@@ -515,7 +514,7 @@ void cb_keyboard(unsigned char key, int x, int y) {
 		resetTransformations();
 		break;
 	case 'x':
-		if (!currLev->isComplete() && currentMode == PLAY_GAME && !currLev->getBall(currBall)->isActive()){
+		if (!currLev->isComplete() && currentMode == PLAY_GAME && !currLev->isActive()){
 			currLev->getBall(currBall)->applyForce(Vec3f(angle,power * MAX_POWER));
 		}
 		break;

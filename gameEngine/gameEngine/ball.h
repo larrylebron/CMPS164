@@ -2,6 +2,8 @@
 #define BALL_H
 
 #pragma once
+#include <map>
+#include <list>
 #include <queue>
 #include <float.h>
 #include "util.h"
@@ -17,6 +19,7 @@ public:
 	ball::ball(int pID, Vec3f pPosition, Vec3f pColor, float pRadius);
 	~ball();
 	Vec3f getPosition();
+	inline float getRadius() {return radius;}
 	void setPosition(Vec3f pos);
 	void draw();
 	void doSimulation(); //handle ball movement at currTime in seconds
@@ -46,7 +49,8 @@ private:
 	std::map<int, CMMPointer<tile>>* tileMap; //pointer to the map of tiles in the current level, referenced by tile ID
 	int playerId;
 
-	void resolveNewTileEntry(int newTileId);//set the new rolling velocity upon tile entry
+	//set the new rolling velocity upon tile entry
+	void resolveNewTileEntry(int newTileId);
 	
 	//returns true if the ball has collided with the cup
 	void checkCupCollision();
@@ -54,10 +58,12 @@ private:
 	/*Returns true if there was a collision during timeElapsed
 	If there is a collision during this time, updates velocity, tile and position
 	*/
-	bool handleCollisions(double timeElapsed);
+	bool checkEdgeCollisions(double timeElapsed);
 
 	//handle a collision with a tile edge plane p
 	void handleEdgePlaneCollision(int edgeIndex, CMMPointer<Plane> p);
+
+	void handleBallCollisions();
 };
 
 #endif

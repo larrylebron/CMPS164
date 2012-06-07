@@ -88,3 +88,11 @@ Vec3f PhysicsManager::calcPlaneReflectionVelocity(Vec3f velocity, Vec3f planeNor
 	Vec3f reflectedDirection = 2 * (-direction).dot(planeNormal) * planeNormal + direction;
 	return mag * reflectedDirection;
 }
+
+bool PhysicsManager::spheresCollide(Vec3f positionA, float radiusA, Vec3f positionB, float radiusB) {
+
+	//the ray connecting the spheres
+	Vec3f ray = positionA - positionB;
+	//returns true if the magnitude of the ray is less than the sum of the radii
+	return (ray.magnitude() <= radiusA + radiusB);
+}

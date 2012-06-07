@@ -1,6 +1,11 @@
 #include "tile.h"
 
 tile::~tile(){
+	std::list< GameObject* >::iterator it;
+	for (it = balls.begin(); it != balls.end(); it++) {
+		delete *it;
+	}
+
 }
 
 tile::tile(int pID, vector<Vec3f> pVertices, vector<int> pNeighbors, Vec3f pColor, float pFrictionMagnitude)

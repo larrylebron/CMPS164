@@ -32,6 +32,10 @@ public:
 
    //Returns the reflection velocity, given the velocity of the object hitting the plane, and the plane normal
    Vec3f calcPlaneReflectionVelocity(Vec3f velocity, Vec3f planeNormal);
+
+   //returns true if the spheres at these positions are colliding
+   bool spheresCollide(Vec3f positionA, float radiusA, Vec3f positionB, float radiusB);
+
 private:
 	PhysicsManager(); //private constructor for singleton
 	static PhysicsManager* m_pInstance; //static instance of the manager

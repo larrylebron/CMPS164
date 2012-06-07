@@ -28,11 +28,14 @@ public:
 
 	CMMPointer<ball> getBall(int pId = 0);
 
-	//get the positions -- currently assumes only a single ball & cup
+	//get the positions -- returns first ball by defualt
 	Vec3f getBallPos(int pId = 0);
 	void resetBallPos();
 	Vec3f getCupPos();
 	Vec3f getTeePos();
+
+	 //returns true if the level is actively simulating
+	bool isActive();
 	
 	//Check the level to confirm it's valid
 	bool checkLevel();
@@ -64,6 +67,10 @@ public:
 	AUTO_SIZE;
 private:
 	void setComponentParams();//update the ball with tile info & any tiles containing cups with that info
+	
+	//simulate the ball movements -- returns true while at least one ball is active
+	bool runBallSimulation();
+
 	//The tiles comprising the level, indexed by their ids
 	std::map<int, CMMPointer<tile>> tiles;
 	std::map<int, CMMPointer<tee>> tees; //the tee
@@ -75,6 +82,7 @@ private:
 	int numCups;
 	int par;
 	int strokes;
+	bool active; //true when level contains moving objects
 	bool complete; //true when the level is complete
 	string levelName;
 };

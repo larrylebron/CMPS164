@@ -41,6 +41,7 @@ void ball::setCupPos(Vec3f pCupPos) {
 
 void ball::setCurrTile(CMMPointer<tile> newTile) {
 	currTile = newTile;
+	currTile->addBall(this);
 }
 
 void ball::draw() {
@@ -82,7 +83,7 @@ void ball::doSimulation() {
 	velocity += pM->calcFrictionVector(currTile->getFrictionMagnitude(), velocity);
 
 	//handle any collisions this step
-	if ( !handleCollisions(timeElapsed) ) {
+	if ( !checkEdgeCollisions(timeElapsed) ) {
 		//end position this frame if there wasn't a collision
 		position = pM->calcPosition(position, velocity, timeElapsed);
 	}
@@ -91,14 +92,19 @@ void ball::doSimulation() {
 	Vec3f tileNorm = currTile->getNormal();
 	position[1] = (-currTile->getDist() - position[0]*tileNorm[0] - position[2]*tileNorm[2])/tileNorm[1];
 
+
 	//If this tile has a cup, check for collison with the cup
 	if (currTile->hasCup()) checkCupCollision();
+
+	//handle collisions with other balls
+	handleBallCollisions();
 }
 
-bool ball::handleCollisions(double timeElapsed) {
-
-	//would eventually update this to check against all simulated objects on the tile
+bool ball::checkEdgeCollisions(double timeElapsed) {
+	
+	//the edge planes to check against
 	vector<CMMPointer<Plane>> planes = currTile->getEdgePlanes();
+
 	bool collisionHandled = false;
 
 	for (unsigned int i = 0; i < planes.size() && !collisionHandled; i++) {
@@ -177,6 +183,23 @@ void ball::resolveNewTileEntry(int newTileId) {
 	currTile = newTile;
 }
 
+void ball::handleBallCollisions() {
+	
+	std::list< GameObject* > ballsOnCurrTile = currTile->getBalls();
+
+	//Check for collisions with other balls on the current tile
+	std::list< GameObject* >::iterator it;
+	for (it = ballsOnCurrTile.begin(); it != ballsOnCurrTile.end(); it++) {
+		CMMPointer<ball> b = static_cast<ball*> (*it);
+		if ( id != b->getID() ) {
+			if (pM->spheresCollide(position, radius, b->getPosition(), b->getRadius()) ) {
+				//if all else fails, this works though it sometimes misses a collision
+				b->applyForce(velocity);
+				velocity = Vec3f(0,0,0);
+			}
+		}
+	}
+}
 
 void ball::checkCupCollision() {
 	Vec3f cupRay = cupPos - position;
