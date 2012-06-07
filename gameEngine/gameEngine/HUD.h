@@ -15,7 +15,7 @@ public:
 	void toggleShowHoleInfo();
 	void setShowShootingUI(bool show);
 	//void toggleShowWinMessage();
-	void draw();
+	void draw(bool isBocce);
 private:
 	bool showScore;
 	bool showHoleInfo;

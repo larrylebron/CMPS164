@@ -176,8 +176,8 @@ bool fileReader::readCourseFile(char* filename, CMMPointer<Course> course) {
 				newLevel->addTee(id, tempTee);
 
 				//add a ball in the location of the tee
-				CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(id, position, BALL_COLOR, BALL_RADIUS));
-				newLevel->addBall(id, tempBall);
+				CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(0, position, BALL_COLOR, BALL_RADIUS));
+				newLevel->addBall(0, tempBall);
 
 				tempTee = 0;
 				tempBall = 0;

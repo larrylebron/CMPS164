@@ -13,7 +13,7 @@
 #include "Course.h"
 #include "util.h"
 #include "HUD.h"
-
+#include "Player.h"
 
 #include "PhysicsManager.h"
 
@@ -53,6 +53,11 @@ typedef enum {
 	DECREASE = -1,
 	INCREASE = 1,
 } change;
+
+typedef enum {
+	MINIGOLF,
+	BOCCE,
+} gameType;
 
 //////////////////////
 // Struct for color //
@@ -122,6 +127,10 @@ int viewportX = 0, viewportY = 0;
 float angle = PI, power = 0.5;
 
 bool addStroke = false;
+bool choseGameType = false;
+gameType gType = BOCCE;
+bool isBocce = (gType == BOCCE);
+int currBall = 0;
 
 ///////////////////////
 // Utility Functions //
@@ -169,7 +178,7 @@ void updateCamera(int w = viewportWidth, int h = viewportHeight) {
 	glLoadIdentity();
 	gluPerspective(cameraFOV * cameraZoom, (double)w / (double)h, cameraZNear, cameraZFar);
 	
-	Vec3f ballPos = currLev->getBallPos();
+	Vec3f ballPos = currLev->getBallPos(currBall);
 	Vec3f destination = cameraPan + rotatedCameraDirection;
 	if (currentMode == PLAY_GAME) {
 		gluLookAt(ballPos[0], ballPos[1] + 15.0f, ballPos[2], ballPos[0], ballPos[1], ballPos[2], 0.0f, 0.0f, -1.0f);
@@ -259,15 +268,25 @@ void new_frame() {
 
 	//if the current level exists
 	if (currLev.isValid()) {
-
-		CMMPointer<ball> ball = currLev->getBall();
+		CMMPointer<ball> aBall = currLev->getBall(currBall);
 
 		//ball is inactive, so show the UI
-		if ( !ball->isActive() ) {
+		if ( !aBall->isActive() ) {
 			// show shooting UI if in playgame mode and game not complete
 			hud->setShowShootingUI(!currLev->isComplete() && currentMode == PLAY_GAME);
 
-			// if returning back to inactive form active
+			cout << currLev->getPlayerTurn();
+			
+			if (gType == BOCCE && !currLev->isComplete() && lastStateActive) {
+				
+				Vec3f color = (currBall % 2 == 0) ? BALL_P1_COLOR : BALL_P2_COLOR;
+
+				CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(0, currLev->getTeePos(), color, BALL_RADIUS));
+				currLev->addBall(currBall + 1, tempBall, true);
+				currBall++;
+			}
+
+			// if returning back to inactive form active	
 			if (lastStateActive) {
 				// reattach menu
 				glutAttachMenu( GLUT_RIGHT_BUTTON );
@@ -277,6 +296,7 @@ void new_frame() {
 					currLev->addStroke();
 				}
 			}
+			
 		} else {
 			// detach menu to prevent menu from screwing up
 			glutDetachMenu( GLUT_RIGHT_BUTTON );
@@ -285,16 +305,16 @@ void new_frame() {
 
 		}
 		
-		lastStateActive = ball->isActive();
+		lastStateActive = aBall->isActive();
 
-		currLev->getBall()->doSimulation();
-		currLev->update();
+		aBall->doSimulation();
+		currLev->update(isBocce);
 	}
 
 	switchToOrtho();
 
 	// draw HUD here
-	hud->draw();
+	hud->draw(isBocce);
 
 	switchBackToFrustum();
 
@@ -435,7 +455,7 @@ void handleUpDown(int direction)
 
 void resetCameraPath() {
 	cameraCurrent = 0.0f;
-	Vec3f ballPos = currLev->getBallPos();
+	Vec3f ballPos = currLev->getBallPos(currBall);
 	Vec3f cupPos = currLev->getCupPos();
 	cameraPath = cupPos - ballPos;
 }
@@ -495,8 +515,8 @@ void cb_keyboard(unsigned char key, int x, int y) {
 		resetTransformations();
 		break;
 	case 'x':
-		if (!currLev->isComplete() && currentMode == PLAY_GAME){
-			currLev->getBall()->applyForce(Vec3f(angle,power * MAX_POWER));
+		if (!currLev->isComplete() && currentMode == PLAY_GAME && !currLev->getBall(currBall)->isActive()){
+			currLev->getBall(currBall)->applyForce(Vec3f(angle,power * MAX_POWER));
 		}
 		break;
 	case 'b':

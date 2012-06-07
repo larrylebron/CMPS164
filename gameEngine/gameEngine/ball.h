@@ -25,6 +25,9 @@ public:
 	void setCupPos(Vec3f pCupPos); //set the ball's reference to the cup position for error checking
 	bool isInCup(); //returns true if the ball's in the cup
 
+	void setPlayerId(int id);
+	int getPlayerId();
+
 	/*
 	if currTile doesn't match the tile detected by position, this function will step it back
 	and retry the missed collision until it is resolved
@@ -41,7 +44,8 @@ private:
 	Vec3f cupPos;//the position of the cup in the level
 	bool inCup; //true if the ball's in the cup
 	std::map<int, CMMPointer<tile>>* tileMap; //pointer to the map of tiles in the current level, referenced by tile ID
-	
+	int playerId;
+
 	void resolveNewTileEntry(int newTileId);//set the new rolling velocity upon tile entry
 	
 	//returns true if the ball has collided with the cup

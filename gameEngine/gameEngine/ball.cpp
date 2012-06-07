@@ -45,7 +45,8 @@ void ball::setCurrTile(CMMPointer<tile> newTile) {
 
 void ball::draw() {
 	//draw the ball -- add radius to position in normal direction so it isn't in the ground
-	if (!inCup)renderManager::Instance()->drawSphere(radius, normal, position + normal*radius, color);
+	if (!inCup)
+		renderManager::Instance()->drawSphere(radius, normal, position + normal*radius, color);
 }
 
 
@@ -187,4 +188,12 @@ string ball::toString() {
 	ss << "ball id: " << id << endl << "position: " << position[0] <<
 		", " << position[1] << ", " << position[2] << endl;
 	return ss.str();
+}
+
+void ball::setPlayerId(int id){
+	ball::playerId = id;
+}
+
+int ball::getPlayerId(){
+	return ball::playerId;
 }

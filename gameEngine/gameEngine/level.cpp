@@ -9,31 +9,12 @@ level::level()
 	numCups = 0;
 	complete = false;
 	par = 1;
-	strokes = 0;
+	strokes = 1;
 }
 
 level::~level()
 {
-	/*
-	std::map<int, CMMPointer<tile>>::iterator itT;
-	for ( itT=tiles.begin() ; itT != tiles.end(); itT++ ) {
-		(*itT).second = 0;
-	}
-	
-	std::map<int, CMMPointer<ball>>::iterator itB;
-	for ( itB=balls.begin() ; itB!= balls.end(); itB++ ) {
-		(*itB).second = 0;
-	}
 
-	std::map<int, CMMPointer<tee>>::iterator itTee;
-	for ( itTee=tees.begin() ; itTee != tees.end(); itTee++ ) {
-		(*itTee).second = 0;
-	}
-
-	std::map<int, CMMPointer<cup>>::iterator itC;
-	for ( itC=cups.begin() ; itC != cups.end(); itC++ ) {
-		(*itC).second = 0;
-	}*/
 }
 
 void level::addTile(int pId, CMMPointer<tile>* pTile) 
@@ -43,9 +24,21 @@ void level::addTile(int pId, CMMPointer<tile>* pTile)
 
 }
 
-void level::addBall(int pId, CMMPointer<ball>* pBall) {
+void level::addBall(int pId, CMMPointer<ball>* pBall, bool newInit) {
 	numBalls++;
 	balls[pId] = *pBall;
+
+	if (newInit)
+	{
+		//initialize the ball's current tile
+		Vec3f ballPos = balls[pId]->getPosition();
+		CMMPointer<tile> ballTile = getTileContainingPoint(ballPos);
+		if (!ballTile.isValid()) Logger::Instance()->err("ball not on any tile");
+		balls[pId]->setCurrTile(ballTile); 
+
+		//set the tile reference map
+		balls[pId]->setTileMap(&tiles);
+	}
 }
 
 void level::addTee(int pId, CMMPointer<tee>* pTee) {
@@ -58,12 +51,16 @@ void level::addCup(int pId, CMMPointer<cup>* pCup) {
 	cups[pId] = *pCup;
 }
 
-CMMPointer<ball> level::getBall() {
-	return (*balls.begin()).second;
+CMMPointer<ball> level::getBall(int pId) {
+	return balls[pId];
 }
 
-Vec3f level::getBallPos() {
-	return (*balls.begin()).second->getPosition();
+Vec3f level::getBallPos(int pId) {
+	return balls[pId]->getPosition();
+}
+
+Vec3f level::getTeePos() {
+	return (*tees.begin()).second->getPosition();
 }
 
 void level::resetBallPos() {
@@ -72,7 +69,10 @@ void level::resetBallPos() {
 }
 
 Vec3f level::getCupPos() {
-	return (*cups.begin()).second->getPosition();
+	if (cups.size() > 0)
+		return (*cups.begin()).second->getPosition();
+	else
+		return balls[0]->getPosition();
 }
 
 bool level::isComplete() {
@@ -149,11 +149,24 @@ void level::setComponentParams() {
 	ball->setCupPos(cupPos);
 }
 
-void level::update() {
+void level::update(bool isBocce, int numTotalBalls) {
 
 	//check to see if the ball's in the cup -- if so, mark the level complete
-	if ( (*balls.begin()).second->isInCup() ) {
+	if ( ((*balls.begin()).second->isInCup() && !isBocce) || (balls.size() == numTotalBalls && isBocce)) {
 		complete = true;
+	}
+
+	// remove cup and tileHasCup boolean
+	if (isBocce && cups.size() != 0) {
+		Vec3f cupPos = getCupPos();
+		CMMPointer<tile> cupTile = getTileContainingPoint(cupPos);
+		cupTile->setContainsCup(false);
+		cups.clear();
+
+		if (strokes > numTotalBalls) {
+			cout << strokes << " " << numTotalBalls << endl;
+			complete = true;
+		}
 	}
 
 	//If ball goes out of bounds handle it
@@ -214,9 +227,23 @@ void level::addStroke(int num) {
 	strokes += num;
 }
 
-int level::getScore()
+int level::getScore(bool isBocce, int playerId)
 {
-	return par - strokes;
+	if (!isBocce)
+		return par - strokes;
+	else
+		return 0;
+}
+
+int level::getPlayerTurn()
+{
+	// assume 2 players
+	float p1Dist = -1;
+	float p2Dist = -1;
+
+	if (balls.size() <= 1)
+		return balls[0]->getPlayerId();
+
 }
 
 string level::toString() {

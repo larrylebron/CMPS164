@@ -27,6 +27,8 @@ const double FRAME_TIME = .0166666666666666666666;
 const Vec3f WALL_COLOR(1.0f, 0.5f, 0.5f);
 const float BOUNDING_PLANE_HEIGHT = .1f;
 const Vec3f BALL_COLOR(1.0f, 0.0f, 0.0f);
+const Vec3f BALL_P1_COLOR(1.0f, 0.0f, 1.0f);
+const Vec3f BALL_P2_COLOR(0.0f, 0.0f, 1.0f);
 const float BALL_RADIUS = .05f;
 const Vec3f CUP_COLOR(0.0f, 0.0f, 0.0f);
 const float CUP_RADIUS = .07f;
@@ -54,6 +56,9 @@ const float POWER_BORDER = 4;
 
 const int viewportWidth = 1024;
 const int viewportHeight = 768;
+
+const int NUM_BPLAYERS = 2;
+const int NUM_BBALLS = 4;
 
 using std::string;
 using std::cout;

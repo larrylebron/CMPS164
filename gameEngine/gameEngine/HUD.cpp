@@ -88,7 +88,7 @@ string getScoreString (int score) {
 	return stream.str();
 }
 
-void HUD::draw() {
+void HUD::draw(bool isBocce) {
 	// if showing score screen, only draw that
 	float x, y;
 	x = y = UI_BORDER;
@@ -101,81 +101,83 @@ void HUD::draw() {
 		// KIV
 	} else {
 		if (showHoleInfo) {
+			if (!isBocce) {
+				// draw first box
+				glBegin(GL_QUADS);
+				glColor3f(1, 1, 1);
+				glVertex2f(x, y);
+				glVertex2f(x, y + HOLE_INFO_HEIGHT_A); 
+				glVertex2f(x + HOLE_INFO_WIDTH_A, y + HOLE_INFO_HEIGHT_A); 
+				glVertex2f(x + HOLE_INFO_WIDTH_A, y);
 			
-			// draw first box
-			glBegin(GL_QUADS);
-			glColor3f(1, 1, 1);
-			glVertex2f(x, y);
-			glVertex2f(x, y + HOLE_INFO_HEIGHT_A); 
-			glVertex2f(x + HOLE_INFO_WIDTH_A, y + HOLE_INFO_HEIGHT_A); 
-			glVertex2f(x + HOLE_INFO_WIDTH_A, y);
-			
-			glVertex2f(viewportWidth - x, y);
-			glVertex2f(viewportWidth - x, y + HOLE_INFO_HEIGHT_B); 
-			glVertex2f(viewportWidth - x - HOLE_INFO_WIDTH_B, y + HOLE_INFO_HEIGHT_B); 
-			glVertex2f(viewportWidth - x - HOLE_INFO_WIDTH_B, y);
-			glEnd();
+				glVertex2f(viewportWidth - x, y);
+				glVertex2f(viewportWidth - x, y + HOLE_INFO_HEIGHT_B); 
+				glVertex2f(viewportWidth - x - HOLE_INFO_WIDTH_B, y + HOLE_INFO_HEIGHT_B); 
+				glVertex2f(viewportWidth - x - HOLE_INFO_WIDTH_B, y);
+				glEnd();
 
 			
-			y += 2 * UI_BORDER;
-			stream << "HOLE #" << holeNumber;
-			str = stream.str();
-			print = (char *)str.c_str();
-			draw_string(x + UI_BORDER, y, print);
+				y += 2 * UI_BORDER;
+				stream << "HOLE #" << holeNumber;
+				str = stream.str();
+				print = (char *)str.c_str();
+				draw_string(x + UI_BORDER, y, print);
 			
-			stream.clear();
-			stream.str("");
-			stream << "Stroke: " << stroke;
-			str = stream.str();
-			print = (char *)str.c_str();
-			draw_string(viewportWidth - x - HOLE_INFO_WIDTH_B + UI_BORDER, y, print);
+				stream.clear();
+				stream.str("");
+				stream << "Stroke: " << stroke;
+				str = stream.str();
+				print = (char *)str.c_str();
+				draw_string(viewportWidth - x - HOLE_INFO_WIDTH_B + UI_BORDER, y, print);
 
-			y += 2 * UI_BORDER;
-			stream.clear();
-			stream.str("");
-			stream << holeName;
-			str = stream.str();
-			print = (char *)str.c_str();
-			draw_string(x + UI_BORDER, y, print);
+				y += 2 * UI_BORDER;
+				stream.clear();
+				stream.str("");
+				stream << holeName;
+				str = stream.str();
+				print = (char *)str.c_str();
+				draw_string(x + UI_BORDER, y, print);
 			
-			y += 2 * UI_BORDER;
-			stream.clear();
-			stream.str("");
-			stream << toPar << " strokes to par";
-			str = stream.str();
-			print = (char *)str.c_str();
-			draw_string(x + UI_BORDER, y, print);
+				y += 2 * UI_BORDER;
+				stream.clear();
+				stream.str("");
+				stream << toPar << " strokes to par";
+				str = stream.str();
+				print = (char *)str.c_str();
+				draw_string(x + UI_BORDER, y, print);
+			}
 		}
 
 		// if won, hide UI
 		if (showWinMessage) {
-			y = viewportHeight - RESULT_HEIGHT;
+			if (!isBocce) {
+				y = viewportHeight - RESULT_HEIGHT;
 			
-			glBegin(GL_QUADS);
-			glColor3f(1, 1, 1);
-			glVertex2f(x, y);
-			glVertex2f(x, y + RESULT_HEIGHT - UI_BORDER); 
-			glVertex2f(x + RESULT_WIDTH, y + RESULT_HEIGHT - UI_BORDER); 
-			glVertex2f(x + RESULT_WIDTH, y);
-			glEnd();
+				glBegin(GL_QUADS);
+				glColor3f(1, 1, 1);
+				glVertex2f(x, y);
+				glVertex2f(x, y + RESULT_HEIGHT - UI_BORDER); 
+				glVertex2f(x + RESULT_WIDTH, y + RESULT_HEIGHT - UI_BORDER); 
+				glVertex2f(x + RESULT_WIDTH, y);
+				glEnd();
 
 
-			y += 2 * UI_BORDER;
-			stream.clear();
-			stream.str("");
-			stream << "Result: " << getScoreString(scores[holeNumber - 1]);
-			str = stream.str();
-			print = (char *)str.c_str();
-			draw_string(x + UI_BORDER, y, print);
+				y += 2 * UI_BORDER;
+				stream.clear();
+				stream.str("");
+				stream << "Result: " << getScoreString(scores[holeNumber - 1]);
+				str = stream.str();
+				print = (char *)str.c_str();
+				draw_string(x + UI_BORDER, y, print);
 
-			y += 2 * UI_BORDER;
-			stream.clear();
-			stream.str("");
-			stream << "Press 'n' for next level";
-			str = stream.str();
-			print = (char *)str.c_str();
-			draw_string(x + UI_BORDER, y, print);
-
+				y += 2 * UI_BORDER;
+				stream.clear();
+				stream.str("");
+				stream << "Press 'n' for next level";
+				str = stream.str();
+				print = (char *)str.c_str();
+				draw_string(x + UI_BORDER, y, print);
+			}
 			// else if UI to be shown
 		} else if (showShootingUI) {
 			x = viewportWidth - SHOOTING_UI_WIDTH;

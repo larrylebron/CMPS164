@@ -22,16 +22,17 @@ public:
 	level();
 	~level();
 	void addTile(int pId, CMMPointer<tile>* pTile);
-	void addBall(int pId, CMMPointer<ball>* pBall);
+	void addBall(int pId, CMMPointer<ball>* pBall, bool newInit = false);
 	void addTee(int pId, CMMPointer<tee>* pTee);
 	void addCup(int pId, CMMPointer<cup>* pCup);
 
-	CMMPointer<ball> getBall();
+	CMMPointer<ball> getBall(int pId = 0);
 
 	//get the positions -- currently assumes only a single ball & cup
-	Vec3f getBallPos();
+	Vec3f getBallPos(int pId = 0);
 	void resetBallPos();
 	Vec3f getCupPos();
+	Vec3f getTeePos();
 	
 	//Check the level to confirm it's valid
 	bool checkLevel();
@@ -43,7 +44,7 @@ public:
 	bool isComplete(); 
 
 	//update the level and draw
-	void update(); 
+	void update(bool isBocce = false, int numTotalBalls = 9); 
 
 	// reset ball positions to tee position
 	void resetLevel();
@@ -55,7 +56,8 @@ public:
 	int getPar();
 	int getStrokes();
 	void addStroke(int num = 1);
-	int getScore();
+	int getScore(bool isBocce = false, int playerId = 0);
+	int getPlayerTurn();
 	//print info about the tiles in the level
 	string toString(); 
 
