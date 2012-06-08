@@ -94,7 +94,9 @@ void ball::doSimulation() {
 
 
 	//If this tile has a cup, check for collison with the cup
-	if (currTile->hasCup()) checkCupCollision();
+	if (currTile->hasCup()) {
+		checkCupCollision();
+	}
 
 	//handle collisions with other balls
 	handleBallCollisions();
@@ -178,7 +180,9 @@ void ball::resolveNewTileEntry(int newTileId) {
 		velocity = newDirection * velocity.magnitude();
 	} 
 	//update currTile
+	currTile->removeBall(this);
 	currTile = newTile;
+	currTile->addBall(this);
 }
 
 void ball::handleBallCollisions() {
@@ -191,12 +195,9 @@ void ball::handleBallCollisions() {
 		CMMPointer<ball> b = static_cast<ball*> (*it);
 		if ( id != b->getID() ) {
 			if (pM->spheresCollide(position, radius, b->getPosition(), b->getRadius()) ) {
-				//if all else fails, this works though it sometimes misses a collision
-				//b->applyForce(velocity);
-				//velocity = Vec3f(0,0,0);
+
 				//from NEHE sphere collision http://nehe.gamedev.net/tutorial/collision_detection/17005/
 				//normalized x axis of the collision
-				cout << "collides";
 				Vec3f xAxis = (b->getPosition() - position).normalize();
 				//the projected velocity of this ball along x
 				Vec3f U1x = xAxis * (xAxis.dot(velocity));

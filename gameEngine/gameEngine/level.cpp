@@ -39,6 +39,7 @@ void level::addBall(int pId, CMMPointer<ball>* pBall, bool newInit) {
 
 		//set the tile reference map
 		balls[pId]->setTileMap(&tiles);
+		balls[pId]->setCupPos(getCupPos());
 	}
 }
 
@@ -66,11 +67,6 @@ Vec3f level::getTeePos() {
 
 bool level::isActive() {
 	return active;
-}
-
-void level::resetBallPos() {
-	Vec3f teePos = (*tees.begin()).second->getPosition();
-	(*balls.begin()).second->setPosition(teePos);
 }
 
 Vec3f level::getCupPos() {
@@ -155,9 +151,8 @@ void level::setComponentParams() {
 }
 
 void level::update(bool isBocce, int numTotalBalls) {
-
 	//check to see if the ball's in the cup -- if so, mark the level complete
-	if ( ((*balls.begin()).second->isInCup() && !isBocce) || (balls.size() == numTotalBalls && isBocce)) {
+	if ( ((*balls.begin()).second->isInCup() && !isBocce) || (balls.size() > numTotalBalls && isBocce)) {
 		complete = true;
 	}
 
@@ -167,11 +162,6 @@ void level::update(bool isBocce, int numTotalBalls) {
 		CMMPointer<tile> cupTile = getTileContainingPoint(cupPos);
 		cupTile->setContainsCup(false);
 		cups.clear();
-
-		if (strokes > numTotalBalls) {
-			cout << strokes << " " << numTotalBalls << endl;
-			complete = true;
-		}
 	}
 
 	//Run the simulation for all balls in the level
@@ -213,10 +203,25 @@ bool level::runBallSimulation() {
 }
 
 
-// reset ball positions to tee position
+// reset ball positions & all level parameters
 void level::resetLevel()
 {
-	resetBallPos();
+	std::map<int, CMMPointer<ball>>::iterator itB;
+	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
+		(*itB).second = 0;   
+	}
+	balls.clear();
+
+	std::map<int, CMMPointer<tile>>::iterator itT;
+	for ( itT=tiles.begin(); itT != tiles.end(); itT++ ) {
+		(*itT).second->clearBalls();  
+	}
+	
+	strokes = 0;
+	numBalls = 0;
+	int id = 0;
+	CMMPointer<ball>* newBall = new CMMPointer<ball>(new ball(id, getTeePos(), BALL_COLOR, BALL_RADIUS));
+	addBall(id, newBall, true);
 	complete = false;
 }
 
@@ -256,14 +261,68 @@ int level::getScore(bool isBocce, int playerId)
 		return 0;
 }
 
-int level::getPlayerTurn()
+int level::getPlayerTurn(int current)
 {
 	// assume 2 players
-	float p1Dist = -1;
-	float p2Dist = -1;
+	float p1Dist = 10000;
+	float p2Dist = 10000;
 
-	if (balls.size() <= 1)
-		return balls[0]->getPlayerId();
+	int p1Balls = 0;
+	int p2Balls = 0;
+
+	// if only first red ball has been thrown, that player gets to go again
+	if (balls.size() <= 1) {
+		cout << "no hand over from " << current << endl;
+		return current;
+	}
+
+	Vec3f mainBall = balls[0]->getPosition();
+
+	for (int i = 1; i < balls.size(); i++) {
+		Vec3f current = balls[i]->getPosition();
+		float dist = (mainBall - current).magnitude();
+		
+		// get the ID of the current ball
+		int player = balls[i]->getPlayerId();
+
+		// if this ball the closest ball to the main ball, save it for that player
+		if (player == 0) {
+			p1Balls++;
+			if (dist < p1Dist) {
+				p1Dist = dist;
+			}
+		} else if (player == 1) {
+			p2Balls++;
+			if (dist < p2Dist) {
+				p2Dist = dist;
+			}
+		}
+	}
+
+	if (p1Balls == 4) {
+		return 1;
+	} else if (p2Balls == 4) {
+		return 0;
+	}
+
+	cout << current << " " << p1Dist << " " << p2Dist << endl;
+
+	int result = 0;
+
+	// if the distance the same, hand over turn
+	if (p1Dist == p2Dist)
+	{
+			result = (current == 0) ? 1 : 0;
+	// if p1 is closer, p2 goes
+	} else if (p1Dist > p2Dist) {
+		cout << "boo" << endl;
+		result = 0;
+	} else {
+		result = 1;
+	}
+
+	cout << result << endl;
+	return result;
 
 }
 

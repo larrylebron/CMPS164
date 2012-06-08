@@ -38,6 +38,8 @@ public:
 	void removeBall(GameObject* b) {balls.remove(b);}
 	//get the list of balls on this tile
 	std::list< GameObject* > getBalls() {return balls;}
+	//clear all balls on this tile
+	void clearBalls();
 	
 	//print info about this tile
 	string toString();

@@ -131,6 +131,8 @@ bool choseGameType = false;
 gameType gType = BOCCE;
 bool isBocce = (gType == BOCCE);
 int currBall = 0;
+Player players[2];
+int currPlayer = 0;
 
 ///////////////////////
 // Utility Functions //
@@ -279,12 +281,22 @@ void new_frame() {
 			
 			if (gType == BOCCE && !currLev->isComplete() && lastStateActive) {
 				
-				Vec3f color = (currBall % 2 == 0) ? BALL_P1_COLOR : BALL_P2_COLOR;
+				if (currBall < 8) {
+					// turn over, next person gets to throw, so create new ball
+					currBall++;
+					
+					// get the current player's turn, check game, decide next turn
+					currPlayer = currLev->getPlayerTurn(currPlayer);
 
-				currBall++;
-				CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(currBall, currLev->getTeePos(), color, BALL_RADIUS));
-				currLev->addBall(currBall, tempBall, true);
-				
+					// let next player turn decide player's color
+					Vec3f color = (currPlayer % 2 == 0) ? BALL_P1_COLOR : BALL_P2_COLOR;
+
+					// create the ball
+					CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(currBall, currLev->getTeePos(), color, BALL_RADIUS));
+					currLev->addBall(currBall, tempBall, true);
+					// set the ball Player
+					currLev->getBall(currBall)->setPlayerId(currPlayer);
+				}
 			}
 
 			// if returning back to inactive form active	
@@ -324,13 +336,11 @@ void new_frame() {
 
 void cb_idle() {
 	double now = frameTimer.getElapsedTime();
-
 	//start a new frame if proper amount of time has elapsed
 	if ( (now - currTime) > FRAME_TIME) {
 		currTime = now;
 		new_frame();
 	}
-
 	glutPostRedisplay();
 }
 
@@ -347,7 +357,6 @@ void cb_display() {
 
 void cb_mouse( int button, int state, int x, int y )
 {
-
 	// Store button state if mouse down
 	if (state == GLUT_DOWN) {	
 		if (currentMode == SHOW_PATH) {
@@ -512,6 +521,8 @@ void cb_keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'r':
 		resetTransformations();
+		currLev->resetLevel();
+		currBall = 0;
 		break;
 	case 'x':
 		if (!currLev->isComplete() && currentMode == PLAY_GAME && !currLev->isActive()){
@@ -521,13 +532,13 @@ void cb_keyboard(unsigned char key, int x, int y) {
 	case 'b':
 		course->previousLevel();
 		currLev = course->getCurrentLevel();
-		currLev->resetLevel();
+		currBall = 0;
 		break;
 	case 'n':
 		// if (currLev->isComplete())
 		course->nextLevel();
 		currLev = course->getCurrentLevel();
-		currLev->resetLevel();
+		currBall = 0;
 		break;
 	case 'i':
 		if (power < 1.0)

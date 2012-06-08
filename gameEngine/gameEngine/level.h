@@ -60,7 +60,7 @@ public:
 	int getStrokes();
 	void addStroke(int num = 1);
 	int getScore(bool isBocce = false, int playerId = 0);
-	int getPlayerTurn();
+	int getPlayerTurn(int current);
 	//print info about the tiles in the level
 	string toString(); 
 

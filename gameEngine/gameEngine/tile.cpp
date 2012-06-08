@@ -34,6 +34,11 @@ void tile::setContainsCup(bool hasCup) {
 	containsCup = hasCup;
 }
 
+
+void tile::clearBalls() {
+	balls.clear();
+}
+
 void tile::buildEdgePlanes() {
 	for (unsigned int i = 0; i < neighbors.size(); i++) {
 			//the edge boundary plane
