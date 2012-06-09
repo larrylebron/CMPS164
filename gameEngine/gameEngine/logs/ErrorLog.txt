@@ -19122,3 +19122,15 @@ ball not on any tile
 Tue May 29 15:23:15 2012
 ========================
 ball not on any tile
+
+
+
+Fri Jun 08 17:54:12 2012
+========================
+Usage Error: program requires two command line arguments in the form "minigolf input_filename"
+
+
+
+Fri Jun 08 17:54:30 2012
+========================
+Usage Error: program requires two command line arguments in the form "minigolf input_filename"

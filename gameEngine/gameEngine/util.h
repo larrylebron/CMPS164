@@ -29,9 +29,9 @@ const float BOUNDING_PLANE_HEIGHT = .1f;
 const Vec3f BALL_COLOR(1.0f, 0.0f, 0.0f);
 const Vec3f BALL_P1_COLOR(1.0f, 0.0f, 1.0f);
 const Vec3f BALL_P2_COLOR(0.0f, 0.0f, 1.0f);
-const float BALL_RADIUS = .05f;
+const float BALL_RADIUS = .08f;
 const Vec3f CUP_COLOR(0.0f, 0.0f, 0.0f);
-const float CUP_RADIUS = .07f;
+const float CUP_RADIUS = .1f;
 const Vec3f TILE_COLOR(0.0f, 0.9f, 0.0f);
 const Vec3f HIGHLIGHT_COLOR(1,1,1);
 const Vec3f WORLD_UP_VECTOR(0,1,0);
@@ -39,6 +39,7 @@ const float DEFAULT_FRICTION_MAGNITUDE = .05f;//the velocity magnitude under whi
 const float GRAVITY_MAGNITUDE = .06f;
 const float MAX_POWER = 5.0f;
 const float KEEP_LAST_SHOOTING_SETTINGS = false;
+
 
 const float UI_BORDER = 10;
 const float HOLE_INFO_HEIGHT_A = 70;

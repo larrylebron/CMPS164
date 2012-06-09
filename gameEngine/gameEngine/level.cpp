@@ -22,7 +22,6 @@ void level::addTile(int pId, CMMPointer<tile>* pTile)
 {
 	numTiles++;
 	tiles[pId] = *pTile;
-
 }
 
 void level::addBall(int pId, CMMPointer<ball>* pBall, bool newInit) {
@@ -217,7 +216,7 @@ void level::resetLevel()
 		(*itT).second->clearBalls();  
 	}
 	
-	strokes = 0;
+	strokes = 1;
 	numBalls = 0;
 	int id = 0;
 	CMMPointer<ball>* newBall = new CMMPointer<ball>(new ball(id, getTeePos(), BALL_COLOR, BALL_RADIUS));
@@ -256,23 +255,54 @@ void level::addStroke(int num) {
 int level::getScore(bool isBocce, int playerId)
 {
 	if (!isBocce)
-		return par - strokes;
-	else
-		return 0;
+		return strokes - par;
+	else {
+		int loser = getPlayerTurn(0, true);
+		float loserMin = DUMMY_VALUE;
+		int score = 0;
+
+		Vec3f mainBall = balls[0]->getPosition();
+
+		for (int i = 1; i < balls.size(); i++) {
+			Vec3f current = balls[i]->getPosition();
+			
+			float dist = (mainBall - current).magnitude();
+		
+			// get the ID of the current ball
+			int player = balls[i]->getPlayerId();
+
+			if (player == loser && dist < loserMin) {
+				loserMin = dist;
+			}
+		}
+
+		for (int i = 1; i < balls.size(); i++) {
+			Vec3f current = balls[i]->getPosition();
+			float dist = (mainBall - current).magnitude();
+		
+			// get the ID of the current ball
+			int player = balls[i]->getPlayerId();
+
+			if (player != loser && dist < loserMin) {
+				score++;
+			}
+		}
+
+		return score;
+	}
 }
 
-int level::getPlayerTurn(int current)
+int level::getPlayerTurn(int current, bool ignoreLimit)
 {
 	// assume 2 players
-	float p1Dist = 10000;
-	float p2Dist = 10000;
+	float p1Dist = DUMMY_VALUE;
+	float p2Dist = DUMMY_VALUE;
 
 	int p1Balls = 0;
 	int p2Balls = 0;
 
 	// if only first red ball has been thrown, that player gets to go again
 	if (balls.size() <= 1) {
-		cout << "no hand over from " << current << endl;
 		return current;
 	}
 
@@ -299,13 +329,13 @@ int level::getPlayerTurn(int current)
 		}
 	}
 
-	if (p1Balls == 4) {
-		return 1;
-	} else if (p2Balls == 4) {
-		return 0;
+	if (!ignoreLimit) {
+		if (p1Balls == 4) {
+			return 1;
+		} else if (p2Balls == 4) {
+			return 0;
+		}
 	}
-
-	cout << current << " " << p1Dist << " " << p2Dist << endl;
 
 	int result = 0;
 
@@ -315,44 +345,14 @@ int level::getPlayerTurn(int current)
 			result = (current == 0) ? 1 : 0;
 	// if p1 is closer, p2 goes
 	} else if (p1Dist > p2Dist) {
-		cout << "boo" << endl;
 		result = 0;
 	} else {
 		result = 1;
 	}
 
-	cout << result << endl;
 	return result;
-
 }
 
 string level::toString() {
 	return "level info";
-	/*
-	cout << "Level Info: \n";
-	cout << "Number of tiles: " << numTiles << endl;
-	std::map<int, CMMPointer<tile>>::iterator it;
-	for ( it=tiles.begin(); it != tiles.end(); it++ ) {
-		//print info for the tile pointed at by the CMMPointer
-		(*it).second->printInfo();
-	}
-	
-	cout << "Number of balls: " << numBalls << endl;
-	std::map<int, CMMPointer<ball>>::iterator itB;
-	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
-		(*itB).second->printInfo();
-	}
-	
-	cout << "Number of tees: " << numTees << endl;
-	std::map<int, CMMPointer<tee>>::iterator itTee;
-	for ( itTee=tees.begin(); itTee != tees.end(); itTee++ ) {
-		(*itTee).second->printInfo();
-	}
-
-	cout << "Number of cups: " << numCups << endl;
-	std::map<int, CMMPointer<cup>>::iterator itC;
-	for ( itC=cups.begin(); itC != cups.end(); itC++ ) {
-		(*itC).second->printInfo();
-	}
-	*/
 }

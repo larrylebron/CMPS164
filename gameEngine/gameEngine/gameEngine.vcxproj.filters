@@ -143,10 +143,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="course.db">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files</Filter>
     </None>
-    <None Include="courseTemp.db">
-      <Filter>Source Files</Filter>
+    <None Include="bocceCourse.db">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="highScores.txt">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -26,15 +26,16 @@
 Timer frameTimer;
 double currTime;
 
-//List of Physics Objects
-
 //The current level
 CMMPointer<level> currLev;
 CMMPointer<Course> course;
-CMMPointer<HUD> hud = new HUD();
+CMMPointer<HUD> hud;
 
 //the file reader
 fileReader* fR;
+
+//the player name
+string playerName;
 
 //camera modes
 typedef enum {
@@ -128,8 +129,8 @@ float angle = PI, power = 0.5;
 
 bool addStroke = false;
 bool choseGameType = false;
-gameType gType = BOCCE;
-bool isBocce = (gType == BOCCE);
+gameType gType;
+bool isBocce;
 int currBall = 0;
 Player players[2];
 int currPlayer = 0;
@@ -245,6 +246,7 @@ Manages animation frame
 */
 
 bool lastStateActive = false;
+bool shotLastBocceBall = false;
 
 void new_frame() {
 	hud->updateInfo(course, angle, power);
@@ -296,6 +298,11 @@ void new_frame() {
 					currLev->addBall(currBall, tempBall, true);
 					// set the ball Player
 					currLev->getBall(currBall)->setPlayerId(currPlayer);
+				} else {
+					hud->updateBocceScore(currLev->getScore(true), currLev->getPlayerTurn(currPlayer, true));
+					if (!shotLastBocceBall) {
+						shotLastBocceBall = true;
+					}
 				}
 			}
 
@@ -303,6 +310,7 @@ void new_frame() {
 			if (lastStateActive) {
 				// reattach menu
 				glutAttachMenu( GLUT_RIGHT_BUTTON );
+				hud->updateBocceScore(currLev->getScore(true), currPlayer);
 				
 				// if game not won, current stroke
 				if (!currLev->isComplete()) {
@@ -319,7 +327,10 @@ void new_frame() {
 		}
 		
 		lastStateActive = currLev->isActive();
-		currLev->update(isBocce);
+		if (shotLastBocceBall) {
+			currLev->update(isBocce, 8);
+		} else 
+			currLev->update(isBocce);
 	}
 
 	switchToOrtho();
@@ -498,7 +509,11 @@ void handle_menu( int ID ) {
 		resetCameraPath();
 		currentMode = SHOW_PATH;
 		break;
-	case 8: // Quit
+	case 8: 		
+		if (!isBocce)
+			hud->toggleShowScore();
+		break;
+	case 9:// Quit
 		exit(0);
 		break;
 	}
@@ -513,6 +528,10 @@ void cb_keyboard(unsigned char key, int x, int y) {
 		exit(0);
 		IMMObject::CollectRemainingObjects(); //Memory cleanup
 		break;
+	case 'a':
+		if (!isBocce)
+			hud->toggleShowScore();
+		break;
 	case 'w':
 		handleUpDown(DECREASE);
 		break;
@@ -522,6 +541,8 @@ void cb_keyboard(unsigned char key, int x, int y) {
 	case 'r':
 		resetTransformations();
 		currLev->resetLevel();
+		shotLastBocceBall = false;
+		lastStateActive = false;
 		currBall = 0;
 		break;
 	case 'x':
@@ -530,15 +551,17 @@ void cb_keyboard(unsigned char key, int x, int y) {
 		}
 		break;
 	case 'b':
-		course->previousLevel();
-		currLev = course->getCurrentLevel();
-		currBall = 0;
+		//Move back a level -- for debug
+		//course->previousLevel();
+		//currLev = course->getCurrentLevel();
+		//currBall = 0;
 		break;
 	case 'n':
-		// if (currLev->isComplete())
-		course->nextLevel();
-		currLev = course->getCurrentLevel();
-		currBall = 0;
+		if (gType == BOCCE || currLev->isComplete()) {
+			course->nextLevel();
+			currLev = course->getCurrentLevel();
+			currBall = 0;
+		}
 		break;
 	case 'i':
 		if (power < 1.0)
@@ -569,10 +592,9 @@ void cb_reshape(int w, int h) {
 }
 
 int main(int argc, char** argv) {
-	char mG[] = "minigolf"; //test string for first parameter
 
-	if ( argc != 3 || (strcmp(mG, argv[1]) != 0) ) {
-		Logger::Instance()->err("Usage Error: program requires two command line arguments in the form \"minigolf input_filename\"");
+	if ( argc != 2 ) {
+		Logger::Instance()->err("Usage Error: program requires one command line arguments in the form \"input_filename\"");
 		return(1);
 	}
 
@@ -580,9 +602,32 @@ int main(int argc, char** argv) {
 	currLev = new level();
 	course = new Course();
 
+	//Get the player's game choice
+	cout << "            SELECT A GAME TYPE:\n"
+		<< "==============================================\n"
+		<< "1) Minigolf\n"
+		<< "2) Bocce Ball\n";
+	int choice = 0;
+	std::cin >> choice;
+
+	if (choice == 1) gType = MINIGOLF;
+	else gType = BOCCE;
+
+	isBocce = (gType == BOCCE);
+
+	string name;
+	if (gType == MINIGOLF) {
+		cout << "Enter your profile name: \n";
+		std::cin >> playerName;
+	}
+	hud = new HUD(playerName);
+
 	//Initialize fileReader, read in file, quit if reader fails
 	fR = new fileReader();
-	if( !fR->readCourseFile(argv[2], course) ) {
+	char* courseFileName;
+	courseFileName = (gType == MINIGOLF) ? "course.db" : "bocceCourse.db";
+	
+	if( !fR->readCourseFile(courseFileName, course) ) {
 		Logger::Instance()->err("course file reader failed");
 		return(1);
 	}
@@ -598,11 +643,13 @@ int main(int argc, char** argv) {
 	resetTransformations();
 
 	// Instructions
-	cout << "==========================================" << endl;
-	cout << "CMPS 164 - Lab 1: Minigolf Level Rendering" << endl;
+	cout << "\n\n==========================================" << endl;
+	cout << "CMPS 164 - GAME ENGINE FINAL PROJECT" << endl;
 	cout << "==========================================" << endl << endl;
 	cout << "Instructions: " << endl;
-	cout << "Use Right Click to Select Modes. Starting Mode: PLAYGAME MODE. Use \"B\" and \"N\" to browse through uncompleted levels." << endl;
+	cout << "Use Right Click to Select Modes. Starting Mode: PLAYGAME MODE" << endl;
+	if (gType == MINIGOLF) 	cout << endl << "Press A at any time to view the score sheet" << endl << endl;
+	else cout << "\n\nPress N to scroll through the levels" << endl;
 
 	// Right Click Menu
 	glutCreateMenu( handle_menu );	// Setup GLUT popup menu
@@ -614,7 +661,8 @@ int main(int argc, char** argv) {
 	glutAddMenuEntry( "Free Look - Camera Rotate", 5);
 	glutAddMenuEntry( "Play Game", 6);
 	glutAddMenuEntry( "Show Path from Ball to Cup", 7);
-	glutAddMenuEntry( "Quit", 8);
+	glutAddMenuEntry( "Toggle Score Sheet (Golf Only)", 8);
+	glutAddMenuEntry( "Quit", 9);
 	glutAttachMenu( GLUT_RIGHT_BUTTON );
 	cout << instructions[currentMode] << endl;
 
