@@ -592,11 +592,11 @@ void cb_reshape(int w, int h) {
 }
 
 int main(int argc, char** argv) {
-
+	/*
 	if ( argc != 2 ) {
 		Logger::Instance()->err("Usage Error: program requires one command line arguments in the form \"input_filename\"");
 		return(1);
-	}
+	}*/
 
 	//Initialize level
 	currLev = new level();
