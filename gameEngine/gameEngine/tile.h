@@ -40,6 +40,10 @@ public:
 	std::list< GameObject* > getBalls() {return balls;}
 	//clear all balls on this tile
 	void clearBalls();
+
+	//for AI simulation
+	void saveState();
+	void restoreState();
 	
 	//print info about this tile
 	string toString();
@@ -47,7 +51,8 @@ public:
 private:
 	vector<int> neighbors; //ids of neighboring tiles, indexed by edge number
 	vector< CMMPointer<Plane> > edgePlanes; //the edge planes & walls used to test for ball collision
-	std::list< GameObject* > balls; //vector of the balls on this tile
+	std::list< GameObject* > balls; //list of the balls on this tile
+	std::list<GameObject* > savedBalls; //saved list of the balls on the tile
 	void buildEdgePlanes(); //build the tile's walls and bounding planes
 	bool highlighted; //tracks whether the tile is highlighted for debugging
 	bool containsCup; //does the tile have a cup?

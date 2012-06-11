@@ -13,7 +13,7 @@
 #include "Course.h"
 #include "util.h"
 #include "HUD.h"
-#include "Player.h"
+#include "AIPlayer.h"
 
 #include "PhysicsManager.h"
 
@@ -131,8 +131,10 @@ bool addStroke = false;
 bool choseGameType = false;
 gameType gType;
 bool isBocce;
+bool bocceAI = false; //true if player 2 is an AI
+bool AIturn = false;
+CMMPointer<AIPlayer> AI; //the AI bocce player
 int currBall = 0;
-Player players[2];
 int currPlayer = 0;
 
 ///////////////////////
@@ -289,15 +291,28 @@ void new_frame() {
 					
 					// get the current player's turn, check game, decide next turn
 					currPlayer = currLev->getPlayerTurn(currPlayer);
-
-					// let next player turn decide player's color
-					Vec3f color = (currPlayer % 2 == 0) ? BALL_P1_COLOR : BALL_P2_COLOR;
+					
+					Vec3f ballColor;					
+					if (currPlayer % 2 == 0) {
+						ballColor = BALL_P1_COLOR;
+						//it's the player's turn
+						if (bocceAI) AIturn = false;
+					} else {
+						ballColor = BALL_P2_COLOR;
+						//it's the AI's turn
+						if (bocceAI) AIturn = true;
+					}
 
 					// create the ball
-					CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(currBall, currLev->getTeePos(), color, BALL_RADIUS));
+					CMMPointer<ball>* tempBall = new CMMPointer<ball>(new ball(currBall, currLev->getTeePos(), ballColor, BALL_RADIUS));
 					currLev->addBall(currBall, tempBall, true);
 					// set the ball Player
 					currLev->getBall(currBall)->setPlayerId(currPlayer);
+
+					if (AIturn) {
+						cout << "AI taking turn " << endl << endl;
+						AI->takeTurn(currBall);
+					}
 				} else {
 					hud->updateBocceScore(currLev->getScore(true), currLev->getPlayerTurn(currPlayer, true));
 					if (!shotLastBocceBall) {
@@ -546,7 +561,8 @@ void cb_keyboard(unsigned char key, int x, int y) {
 		currBall = 0;
 		break;
 	case 'x':
-		if (!currLev->isComplete() && currentMode == PLAY_GAME && !currLev->isActive()){
+		if (!currLev->isComplete() && currentMode == PLAY_GAME && 
+			!currLev->isActive() && !AIturn){
 			currLev->getBall(currBall)->applyForce(Vec3f(angle,power * MAX_POWER));
 		}
 		break;
@@ -560,6 +576,7 @@ void cb_keyboard(unsigned char key, int x, int y) {
 		if (gType == BOCCE || currLev->isComplete()) {
 			course->nextLevel();
 			currLev = course->getCurrentLevel();
+			if (bocceAI) AI->setLevel(currLev);
 			currBall = 0;
 		}
 		break;
@@ -592,7 +609,7 @@ void cb_reshape(int w, int h) {
 }
 
 int main(int argc, char** argv) {
-	/*
+	/* For inputting file from command line
 	if ( argc != 2 ) {
 		Logger::Instance()->err("Usage Error: program requires one command line arguments in the form \"input_filename\"");
 		return(1);
@@ -601,7 +618,8 @@ int main(int argc, char** argv) {
 	//Initialize level
 	currLev = new level();
 	course = new Course();
-
+	
+	
 	//Get the player's game choice
 	cout << "            SELECT A GAME TYPE:\n"
 		<< "==============================================\n"
@@ -619,7 +637,15 @@ int main(int argc, char** argv) {
 	if (gType == MINIGOLF) {
 		cout << "Enter your profile name: \n";
 		std::cin >> playerName;
+	} else {
+		cout << "How many players? (Enter 1 or 2)\n";
+		int numPlayers;
+		std::cin >> numPlayers;
+		//if only 1 player, set AI to true & initialize the AI
+		bocceAI = (numPlayers == 1);
+		if (bocceAI) AI = new AIPlayer();
 	}
+	
 	hud = new HUD(playerName);
 
 	//Initialize fileReader, read in file, quit if reader fails
@@ -633,6 +659,7 @@ int main(int argc, char** argv) {
 	}
 
 	currLev = course->getCurrentLevel();
+	if (bocceAI) AI->setLevel(currLev);
 
 	glutInit(&argc, argv);
 

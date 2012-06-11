@@ -151,7 +151,7 @@ void level::setComponentParams() {
 
 void level::update(bool isBocce, int numTotalBalls) {
 	//check to see if the ball's in the cup -- if so, mark the level complete
-	if ( ((*balls.begin()).second->isInCup() && !isBocce) || (balls.size() > numTotalBalls && isBocce)) {
+	if ( (!isBocce && (*balls.begin()).second->isInCup()) || (balls.size() > numTotalBalls && isBocce)) {
 		complete = true;
 	}
 
@@ -164,7 +164,7 @@ void level::update(bool isBocce, int numTotalBalls) {
 	}
 
 	//Run the simulation for all balls in the level
-	active = runBallSimulation();
+	active = runBallSimulation(false);
 
 	std::map<int, CMMPointer<tile>>::iterator it;
 	for ( it=tiles.begin(); it != tiles.end(); it++ ) {
@@ -182,13 +182,25 @@ void level::update(bool isBocce, int numTotalBalls) {
 	}
 }
 
-bool level::runBallSimulation() {
+float level::runAIBallSimulation(int ballId, Vec3f AIShot) {
+	
+	//Apply the AI's sim shot
+	balls[ballId]->applyForce(AIShot);
+
+	//runs the AI simulation as fast as possible
+	while (runBallSimulation(true));
+
+	//distance from the AI ball to the palino
+	return (balls[0]->getPosition() - balls[ballId]->getPosition()).magnitude();
+}
+
+bool level::runBallSimulation(bool isAISim) {
 	bool currentlyActive = false;
 
 	std::map<int, CMMPointer<ball>>::iterator itB;
 	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
 		CMMPointer<ball> b = (*itB).second;
-		b->doSimulation(); //run the ball's simulation
+		b->doSimulation(isAISim); //run the ball's simulation for real or AI
 
 		//If ball misses a collision, handle it
 		Vec3f ballPos = b->getPosition();
@@ -222,6 +234,30 @@ void level::resetLevel()
 	CMMPointer<ball>* newBall = new CMMPointer<ball>(new ball(id, getTeePos(), BALL_COLOR, BALL_RADIUS));
 	addBall(id, newBall, true);
 	complete = false;
+}
+
+void level::saveState() {
+	std::map<int, CMMPointer<ball>>::iterator itB;
+	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
+		(*itB).second->saveState();   
+	}
+
+	std::map<int, CMMPointer<tile>>::iterator itT;
+	for ( itT=tiles.begin(); itT != tiles.end(); itT++ ) {
+		(*itT).second->saveState();  
+	}
+}
+
+void level::restoreState() {
+	std::map<int, CMMPointer<ball>>::iterator itB;
+	for ( itB=balls.begin(); itB != balls.end(); itB++ ) {
+		(*itB).second->restoreState();   
+	}
+
+	std::map<int, CMMPointer<tile>>::iterator itT;
+	for ( itT=tiles.begin(); itT != tiles.end(); itT++ ) {
+		(*itT).second->restoreState();  
+	}
 }
 
 void level::setLevelName(string name)
@@ -342,7 +378,7 @@ int level::getPlayerTurn(int current, bool ignoreLimit)
 	// if the distance the same, hand over turn
 	if (p1Dist == p2Dist)
 	{
-			result = (current == 0) ? 1 : 0;
+		result = (current == 0) ? 1 : 0;
 	// if p1 is closer, p2 goes
 	} else if (p1Dist > p2Dist) {
 		result = 0;

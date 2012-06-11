@@ -9,7 +9,7 @@ class Simulated
 public:
 	Simulated();
 	virtual ~Simulated(void){}
-	virtual void doSimulation() = 0; //must implement a physics simulation
+	virtual void doSimulation(bool AIProjection) = 0; //must implement a physics simulation
 	Vec3f getVelocity(){return velocity;}
 	void setVelocity(Vec3f pVelocity) {velocity = pVelocity;}
 	bool isActive() {return active;} //return active status

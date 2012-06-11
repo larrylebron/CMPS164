@@ -52,6 +52,15 @@ public:
 	// reset ball positions to tee position
 	void resetLevel();
 
+	//save/restore the current level state -- used for AI simulation
+	void saveState();
+	void restoreState();
+	/*
+	runs the AI ball simulation of AIshot on ballId
+	returns the distance of this shot from the palino
+	*/
+	float runAIBallSimulation(int ballId, Vec3f AIShot);
+
 	void setLevelName(string name);
 	string getLevelName();
 
@@ -68,8 +77,11 @@ public:
 private:
 	void setComponentParams();//update the ball with tile info & any tiles containing cups with that info
 	
-	//simulate the ball movements -- returns true while at least one ball is active
-	bool runBallSimulation();
+	/*simulate the ball movements -- returns true while at least one ball is active
+	if isAISim, can be called quickly and will simulate based on the FRAME_TIME constant
+	otherwise, uses the actual gametime
+	*/
+	bool runBallSimulation(bool isAISim);
 
 	//The tiles comprising the level, indexed by their ids
 	std::map<int, CMMPointer<tile>> tiles;
@@ -85,6 +97,7 @@ private:
 	bool active; //true when level contains moving objects
 	bool complete; //true when the level is complete
 	string levelName;
+
 };
 
 #endif

@@ -21,7 +21,8 @@ public:
 	inline float getRadius() {return radius;}
 	void setPosition(Vec3f pos);
 	void draw();
-	void doSimulation(); //handle ball movement at currTime in seconds
+	//handle ball's simulation. If AI projection is true, simulated based on FRAME_TIME instead of actual time elapsed
+	void doSimulation(bool AIprojection);
 	void ball::setCurrTile(CMMPointer<tile> newTile); //set the ball's current tile
 	void setTileMap(std::map<int, CMMPointer<tile>>*);//set the tile's map of level tiles for neighbor reference
 	void setCupPos(Vec3f pCupPos); //set the ball's reference to the cup position for error checking
@@ -29,6 +30,10 @@ public:
 
 	void setPlayerId(int id);
 	int getPlayerId();
+
+	//for AI simulation
+	void saveState();
+	void restoreState();
 
 	/*
 	if currTile doesn't match the tile detected by position, this function will step it back
@@ -41,8 +46,15 @@ private:
 	Vec3f position;
 	Vec3f lastGoodPosition; //last good position -- used if an error occurred
 	CMMPointer<tile> lastGoodTile; //last good tile -- used if an error occurred
-	float radius;
 	CMMPointer<tile> currTile; //the ball's current tile
+
+	//saved states for AI simulation
+	Vec3f savedPosition;
+	Vec3f savedLastGoodPosition;
+	CMMPointer<tile> savedLastGoodTile;
+	CMMPointer<tile> savedCurrTile;
+
+	float radius;
 	Vec3f cupPos;//the position of the cup in the level
 	bool inCup; //true if the ball's in the cup
 	std::map<int, CMMPointer<tile>>* tileMap; //pointer to the map of tiles in the current level, referenced by tile ID

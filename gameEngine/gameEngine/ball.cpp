@@ -51,13 +51,13 @@ void ball::draw() {
 }
 
 
-void ball::doSimulation() {
+void ball::doSimulation(bool AIprojection) {
 
 	if (inCup) return;
 
 	//update timer
 	double currTime = timer.getElapsedTimeInSec();
-	double timeElapsed = currTime - lastFrameTime;
+	double timeElapsed = (AIprojection) ? FRAME_TIME : currTime - lastFrameTime;
 	lastFrameTime = currTime;
 	
 	//update velocity with any new forces
@@ -241,4 +241,18 @@ void ball::setPlayerId(int id){
 
 int ball::getPlayerId(){
 	return ball::playerId;
+}
+
+void ball::saveState() {
+	savedPosition = position;
+	savedLastGoodPosition = lastGoodPosition;
+	savedLastGoodTile = lastGoodTile;
+	savedCurrTile = currTile;
+}
+
+void ball::restoreState() {
+	position = savedPosition;
+	lastGoodPosition = savedLastGoodPosition;
+	lastGoodTile = savedLastGoodTile;
+	currTile = savedCurrTile;
 }

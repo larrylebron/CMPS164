@@ -11,7 +11,6 @@
 
 #include "..\Logger.h"
 
-
 class IMMObject
 {
 	private:

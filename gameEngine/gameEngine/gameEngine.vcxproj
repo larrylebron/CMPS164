@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AIPlayer.cpp" />
     <ClCompile Include="ball.cpp" />
     <ClCompile Include="Course.cpp" />
     <ClCompile Include="HUD.cpp" />
@@ -33,6 +34,7 @@
     <ClCompile Include="Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIPlayer.h" />
     <ClInclude Include="ball.h" />
     <ClInclude Include="Course.h" />
     <ClInclude Include="HUD.h" />

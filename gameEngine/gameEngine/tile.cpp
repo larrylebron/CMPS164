@@ -108,3 +108,11 @@ string tile::toString() {
 	ss << endl;
 	return ss.str();
 }
+
+void tile::saveState() {
+	savedBalls = balls;
+}
+
+void tile::restoreState() {
+	balls = savedBalls;
+}
